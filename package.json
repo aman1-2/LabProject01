@@ -1,0 +1,27 @@
+{
+  "name": "pathcare",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PathCare On-demand Pathology and Diagnostics Platform",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n \"api,worker,web\" -c \"cyan,magenta,green\" \"pnpm --filter @pathcare/backend dev\" \"pnpm --filter @pathcare/backend dev:worker\" \"pnpm --filter @pathcare/frontend dev\"",
+    "dev:api": "pnpm --filter @pathcare/backend dev",
+    "dev:worker": "pnpm --filter @pathcare/backend dev:worker",
+    "dev:web": "pnpm --filter @pathcare/frontend dev",
+    "build": "pnpm -r --filter=!@pathcare/mobile-* run build",
+    "lint": "eslint .",
+    "test": "pnpm -r --filter=!@pathcare/mobile-user run test",
+    "test:integration": "pnpm --filter @pathcare/backend test:integration",
+    "verify": "pnpm lint && pnpm test && pnpm test:integration"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.39.5",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0"
+  }
+}

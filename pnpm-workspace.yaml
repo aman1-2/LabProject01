@@ -1,0 +1,13 @@
+packages:
+  - 'backend'
+  - 'frontend'
+  - 'mobile/*'
+  - 'common/*'
+
+allowBuilds:
+  bcrypt: true
+  detox: true
+  dtrace-provider: false
+  esbuild: true
+  mongodb-memory-server: true
+  msgpackr-extract: true

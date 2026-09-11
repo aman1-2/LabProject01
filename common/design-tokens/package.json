@@ -1,0 +1,10 @@
+{
+  "name": "@pathcare/design-tokens",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src *.js",
+    "test": "node --test src/index.test.js"
+  }
+}

@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Self-hosted Plus Jakarta Sans */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-800.woff2') format('woff2');
+}
+
+:root {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: theme('colors.ink');
+  background-color: theme('colors.bg');
+}
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Prototype-identical classes using tokens */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  border-radius: theme('borderRadius.pill');
+  padding: 13px 26px;
+  font-size: 15px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: theme('colors.blue600');
+  color: theme('colors.white');
+}
+.btn-primary:hover {
+  background-color: theme('colors.blue700');
+}
+
+.btn-ghost {
+  background-color: theme('colors.white');
+  color: theme('colors.ink');
+  border: 1.5px solid theme('colors.border');
+}
+.btn-ghost:hover {
+  border-color: theme('colors.blue600');
+  color: theme('colors.blue600');
+}
+
+.btn-danger {
+  background-color: theme('colors.red');
+  color: theme('colors.white');
+}
+
+.btn-sm {
+  padding: 9px 18px;
+  font-size: 13.5px;
+}
+
+.btn-disabled {
+  background-color: theme('colors.border');
+  color: theme('colors.muted2');
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.card {
+  background: theme('colors.white');
+  border: 1px solid theme('colors.border');
+  border-radius: theme('borderRadius.xl');
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+.card-interactive:hover {
+  box-shadow: theme('boxShadow.card');
+}
+.card-selected {
+  border-color: theme('colors.blue600') !important;
+  background-color: theme('colors.blue50') !important;
+}
+
+.input-field {
+  width: 100%;
+  border: 1.5px solid theme('colors.border');
+  border-radius: theme('borderRadius.md');
+  padding: 12px 16px;
+  font-size: 14.5px;
+  background-color: theme('colors.white');
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-field:focus {
+  border-color: theme('colors.blue600');
+  box-shadow: 0 0 0 4px theme('colors.blue100');
+}
+
+/* ImageSlot gradient illustration blob from DESIGN_SPEC §2.6 */
+.hero-gradient-blob {
+  background: radial-gradient(circle at 32% 30%, theme('colors.blue500'), theme('colors.blue600') 55%, theme('colors.blue900'));
+  position: relative;
+  overflow: hidden;
+}
+.hero-gradient-blob::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 44%;
+  height: 44%;
+  background: rgba(255, 255, 255, 0.25);
+  filter: blur(20px);
+  border-radius: 50%;
+}
+.hero-gradient-blob::after {
+  content: '';
+  position: absolute;
+  bottom: 8%;
+  right: 8%;
+  width: 30%;
+  height: 30%;
+  background: linear-gradient(135deg, theme('colors.amber'), theme('colors.red'));
+  border-radius: 38% 62% 60% 40% / 50% 45% 55% 50%;
+}
+
+/* WhatsApp FAB */
+.wa-fab {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 56px;
+  height: 56px;
+  border-radius: theme('borderRadius.pill');
+  background-color: theme('colors.green');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: theme('boxShadow.fab');
+  cursor: pointer;
+  z-index: 150;
+  transition: background-color 0.15s, transform 0.15s;
+}
+.wa-fab:hover {
+  background-color: theme('colors.green');
+  filter: brightness(0.9);
+  transform: scale(1.04);
+}
+
+/* Responsive row pattern (.rrow) from DESIGN_SPEC & Prototype */
+.rrow {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr auto;
+  padding: 16px 20px;
+  align-items: center;
+  font-size: 13.5px;
+}
+
+@media (max-width: 768px) {
+  .rrow {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 16px;
+  }
+}
+
+/* Hide scrollbar for horizontal tabs on mobile */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

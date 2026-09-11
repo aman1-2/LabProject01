@@ -1,0 +1,52 @@
+import express from 'express';
+import healthRoutes from './v1/healthRoutes.js';
+import authRoutes from './v1/authRoutes.js';
+import catalogueRoutes from './v1/catalogueRoutes.js';
+import labRoutes from './v1/labRoutes.js';
+import cartRoutes from './v1/cartRoutes.js';
+import bookingRoutes from './v1/bookingRoutes.js';
+import doctorRoutes from './v1/doctorRoutes.js';
+import appointmentRoutes from './v1/appointmentRoutes.js';
+import partnerRoutes from './v1/partnerRoutes.js';
+import paymentRoutes from './v1/paymentRoutes.js';
+import webhookRoutes from './v1/webhookRoutes.js';
+import riderRoutes from './v1/riderRoutes.js';
+import reportRoutes, { labReportRouter } from './v1/reportRoutes.js';
+import labAdminRoutes from './v1/labAdminRoutes.js';
+import familyMemberRoutes from './v1/familyMemberRoutes.js';
+import addressRoutes from './v1/addressRoutes.js';
+import subscriptionRoutes from './v1/subscriptionRoutes.js';
+import userRoutes from './v1/userRoutes.js';
+import adminRoutes from './v1/adminRoutes.js';
+import feedbackRoutes from './v1/feedbackRoutes.js';
+
+const router = express.Router();
+
+router.use(healthRoutes);
+router.use('/auth', authRoutes);
+router.use('/tests', catalogueRoutes);
+router.use('/labs', labRoutes);
+router.use('/cart', cartRoutes);
+router.use('/bookings', bookingRoutes);
+router.use('/doctors', doctorRoutes);
+router.use('/doctor', doctorRoutes);
+router.use('/appointments', appointmentRoutes);
+router.use('/partner', partnerRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/webhooks', webhookRoutes);
+router.use('/rider', riderRoutes);
+router.use('/riders', riderRoutes);
+router.use('/reports', reportRoutes);
+router.use('/lab/reports', labReportRouter);
+router.use('/labs/reports', labReportRouter);
+router.use('/lab', labAdminRoutes);
+router.use('/family-members', familyMemberRoutes);
+router.use('/family_members', familyMemberRoutes);
+router.use('/addresses', addressRoutes);
+router.use('/subscriptions', subscriptionRoutes);
+router.use('/users', userRoutes);
+router.use('/admin', adminRoutes);
+router.use('/feedback', feedbackRoutes);
+
+export default router;
+

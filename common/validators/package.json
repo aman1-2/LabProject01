@@ -1,0 +1,13 @@
+{
+  "name": "@pathcare/validators",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src",
+    "test": "node --test src/index.test.js"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  }
+}
