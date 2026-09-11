@@ -325,11 +325,3 @@ These are enforced in code and in tests, not just documented.
 - **Accreditation is verified, not assumed.** Partner labs record NABL/ISO status with expiry tracking.
 
 ---
-
-## Further documentation
-
-| File | What is in it |
-|---|---|
-| `DESIGN_SPEC.md` | Visual system, components, screen specs |
-| `DEPLOYMENT.md` | EC2, load balancer, target groups, production env |
-| `RUNBOOK.md` | Local development commands and troubleshooting |
