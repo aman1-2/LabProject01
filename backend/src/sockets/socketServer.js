@@ -1,4 +1,3 @@
-// backend/src/sockets/socketServer.js
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createPubSubClient } from '../config/redisConfig.js';

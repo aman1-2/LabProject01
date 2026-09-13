@@ -2,7 +2,47 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import testRepository from '../../src/repositories/testRepository.js';
 import labRepository from '../../src/repositories/labRepository.js';
 import catalogueService from '../../src/services/catalogueService.js';
-import { REAL_TESTS, REAL_LABS } from '../../src/scripts/seedCatalogue.js';
+import { REAL_TESTS } from '../../src/scripts/seedCatalogue.js';
+
+/**
+ * Fixtures for the behaviour under test, defined here rather than pulled from
+ * the seed catalogue.
+ *
+ * These are unit tests with mocked repositories: what they verify is arithmetic
+ * and ordering, not which products the business happens to sell. Borrowing real
+ * catalogue rows coupled them to it — when the launch region moved and the
+ * catalogue was replaced, four tests failed despite the service being correct,
+ * and the multiplier test quietly lost its teeth because every new lab shares a
+ * multiplier of 1. Distinct multipliers below keep it discriminating.
+ */
+const FIXTURE_TEST = {
+  name: 'Fixture Blood Panel',
+  slug: 'fixture-blood-panel',
+  category: 'single',
+  sampleType: 'Blood',
+  homeCollectionAvailable: true,
+  basePrice: 299,
+  turnaroundHrs: 6,
+  description: 'Fixture used by unit tests.',
+};
+
+const FIXTURE_IMAGING = {
+  name: 'Fixture Ultrasound',
+  slug: 'fixture-ultrasound',
+  category: 'imaging',
+  sampleType: 'Imaging',
+  // The property under test: a scan cannot be collected at home.
+  homeCollectionAvailable: false,
+  basePrice: 1200,
+  turnaroundHrs: 24,
+  description: 'Fixture used by unit tests.',
+};
+
+const FIXTURE_LABS = [
+  { name: 'Fixture Lab A', area: 'A', address: 'A', geo: { type: 'Point', coordinates: [78.0418, 30.3256] }, priceMultiplier: 1.0,  turnaroundHrs: 6, isVerified: true },
+  { name: 'Fixture Lab B', area: 'B', address: 'B', geo: { type: 'Point', coordinates: [78.0125, 30.3340] }, priceMultiplier: 0.92, turnaroundHrs: 8, isVerified: true },
+  { name: 'Fixture Lab C', area: 'C', address: 'C', geo: { type: 'Point', coordinates: [78.0583, 30.3456] }, priceMultiplier: 0.85, turnaroundHrs: 12, isVerified: true },
+];
 
 describe('Catalogue Service Unit Tests', () => {
   beforeEach(() => {
@@ -30,31 +70,29 @@ describe('Catalogue Service Unit Tests', () => {
     });
 
     it('filters by search keyword across test names and descriptions', async () => {
-      const cbcTest = REAL_TESTS.find((t) => t.slug === 'complete-blood-count-cbc');
       jest.spyOn(testRepository, 'findTests').mockResolvedValue({
-        items: [cbcTest],
+        items: [FIXTURE_TEST],
         total: 1,
       });
 
       const result = await catalogueService.getTests({
-        search: 'CBC',
+        search: 'Blood Panel',
         page: 1,
         limit: 10,
       });
 
       expect(result.items).toHaveLength(1);
-      expect(result.items[0].name).toContain('Complete Blood Count');
+      expect(result.items[0].name).toContain('Blood Panel');
     });
   });
 
   describe('getTestBySlug', () => {
     it('returns full test detail for a valid slug', async () => {
-      const cbcTest = REAL_TESTS.find((t) => t.slug === 'complete-blood-count-cbc');
-      jest.spyOn(testRepository, 'findTestBySlug').mockResolvedValue(cbcTest);
+      jest.spyOn(testRepository, 'findTestBySlug').mockResolvedValue(FIXTURE_TEST);
 
-      const result = await catalogueService.getTestBySlug('complete-blood-count-cbc');
+      const result = await catalogueService.getTestBySlug('fixture-blood-panel');
 
-      expect(result.name).toBe('Complete Blood Count (CBC)');
+      expect(result.name).toBe('Fixture Blood Panel');
       expect(result.homeCollectionAvailable).toBe(true);
       expect(result.basePrice).toBe(299);
       expect(result.turnaroundHrs).toBe(6);
@@ -71,19 +109,17 @@ describe('Catalogue Service Unit Tests', () => {
 
   describe('getNearbyLabsForTest', () => {
     it('sorts labs by distance and applies priceMultiplier genuinely to calculate per-lab price', async () => {
-      const cbcTest = REAL_TESTS.find((t) => t.slug === 'complete-blood-count-cbc'); // basePrice: 299
-      jest.spyOn(testRepository, 'findTestById').mockResolvedValue(cbcTest);
-      jest.spyOn(testRepository, 'findTestBySlug').mockResolvedValue(cbcTest);
-      jest.spyOn(labRepository, 'findAllVerifiedLabs').mockResolvedValue(REAL_LABS);
+      jest.spyOn(testRepository, 'findTestById').mockResolvedValue(FIXTURE_TEST);
+      jest.spyOn(testRepository, 'findTestBySlug').mockResolvedValue(FIXTURE_TEST);
+      jest.spyOn(labRepository, 'findAllVerifiedLabs').mockResolvedValue(FIXTURE_LABS);
 
-      // Dehradun Clock Tower center reference coords: 30.3256, 78.0418
       const result = await catalogueService.getNearbyLabsForTest({
         lat: 30.3256,
         lng: 78.0418,
-        testId: 'complete-blood-count-cbc',
+        testId: 'fixture-blood-panel',
       });
 
-      expect(result.test.name).toBe('Complete Blood Count (CBC)');
+      expect(result.test.name).toBe('Fixture Blood Panel');
       expect(result.labs).toHaveLength(3);
 
       // Verify distance ascending order
@@ -91,28 +127,28 @@ describe('Catalogue Service Unit Tests', () => {
         expect(result.labs[i].distanceKm).toBeLessThanOrEqual(result.labs[i + 1].distanceKm);
       }
 
-      // Verify priceMultiplier application:
-      // Sunrise Diagnostics (mult: 1.0) -> Math.round(299 * 1.0) = 299
-      // Doon Path Labs (mult: 0.92) -> Math.round(299 * 0.92) = 275
-      // Himalaya Medicare (mult: 0.85) -> Math.round(299 * 0.85) = 254
-      const sunrise = result.labs.find((l) => l.name === 'Sunrise Diagnostics');
-      const doon = result.labs.find((l) => l.name === 'Doon Path Labs');
-      const himalaya = result.labs.find((l) => l.name === 'Himalaya Medicare');
+      // Each multiplier must produce a DIFFERENT price, or the assertion cannot
+      // tell a working multiplier from one that is ignored:
+      //   1.00 -> Math.round(299 * 1.00) = 299
+      //   0.92 -> Math.round(299 * 0.92) = 275
+      //   0.85 -> Math.round(299 * 0.85) = 254
+      const a = result.labs.find((l) => l.name === 'Fixture Lab A');
+      const b = result.labs.find((l) => l.name === 'Fixture Lab B');
+      const c = result.labs.find((l) => l.name === 'Fixture Lab C');
 
-      expect(sunrise.price).toBe(299);
-      expect(doon.price).toBe(275);
-      expect(himalaya.price).toBe(254);
+      expect(a.price).toBe(299);
+      expect(b.price).toBe(275);
+      expect(c.price).toBe(254);
     });
 
     it('strictly preserves homeCollectionAvailable = false for imaging tests', async () => {
-      const ultrasound = REAL_TESTS.find((t) => t.slug === 'ultrasound-whole-abdomen');
-      jest.spyOn(testRepository, 'findTestBySlug').mockResolvedValue(ultrasound);
-      jest.spyOn(labRepository, 'findAllVerifiedLabs').mockResolvedValue(REAL_LABS);
+      jest.spyOn(testRepository, 'findTestBySlug').mockResolvedValue(FIXTURE_IMAGING);
+      jest.spyOn(labRepository, 'findAllVerifiedLabs').mockResolvedValue(FIXTURE_LABS);
 
       const result = await catalogueService.getNearbyLabsForTest({
         lat: 30.3165,
         lng: 78.0322,
-        testId: 'ultrasound-whole-abdomen',
+        testId: 'fixture-ultrasound',
       });
 
       expect(result.test.homeCollectionAvailable).toBe(false);

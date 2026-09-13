@@ -125,6 +125,8 @@ export default [
       '**/jest.config.js',
       '**/metro.config.js',
       '**/babel.config.js',
+      '**/vite.config.js',
+      '**/vitest.config.js',
       '**/*.config.cjs',
       // Repo scripts that are run with `node`, not bundled. Without this they
       // matched no block at all, so `console` and `process` — the only two

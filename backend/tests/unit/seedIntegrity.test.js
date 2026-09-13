@@ -74,9 +74,29 @@ describe('Seed data carries no fabricated credentials (HIGH H11)', () => {
   describe('test catalogue', () => {
     it('is unchanged — legitimate business data per §3.1', () => {
       expect(REAL_TESTS.length).toBeGreaterThan(0);
-      const cbc = REAL_TESTS.find((t) => t.slug === 'complete-blood-count-cbc');
-      expect(cbc).toBeDefined();
-      expect(cbc.basePrice).toBe(299);
+
+      // Every entry has to be a real, priced, orderable product. Naming one
+      // specific test here pinned the guard to a single launch region — the
+      // move to Moradabad replaced the catalogue and this failed even though
+      // the data was fine. Assert the shape that makes a row sellable instead.
+      for (const t of REAL_TESTS) {
+        expect(typeof t.name).toBe('string');
+        expect(t.name.length).toBeGreaterThan(2);
+        expect(t.slug).toMatch(/^[a-z0-9-]+$/);
+        expect(typeof t.basePrice).toBe('number');
+        expect(t.basePrice).toBeGreaterThan(0);
+        expect(typeof t.turnaroundHrs).toBe('number');
+        expect(typeof t.homeCollectionAvailable).toBe('boolean');
+        // A scan is done at a centre; it must never be offered for home collection.
+        if (t.category === 'imaging') {
+          expect(t.homeCollectionAvailable).toBe(false);
+        }
+      }
+
+      // Slugs address catalogue rows in URLs and carts; a duplicate silently
+      // makes one of the two unreachable.
+      const slugs = REAL_TESTS.map((t) => t.slug);
+      expect(new Set(slugs).size).toBe(slugs.length);
     });
   });
 

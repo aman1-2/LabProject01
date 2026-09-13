@@ -1,4 +1,3 @@
-// backend/src/controllers/riderController.js
 import { redisGeoHelper } from '../utils/redisGeoHelper.js';
 import { riderRepository } from '../repositories/riderRepository.js';
 import { Booking } from '../schemas/Booking.js';
@@ -97,6 +96,12 @@ export async function getJobs(req, res, next) {
       // collectionAddress is a snapshot on the booking, so it needs no populate.
       activeJob = await Booking.findById(rider.currentBookingId)
         .populate('patientId', 'name phone')
+        // Who the sample is actually FROM. On a family booking the account
+        // holder is the contact, not the person being drawn from — without
+        // this the rider sees "QA Patient" and has no way to know the blood
+        // should come from their spouse. The lab queue has always populated
+        // this; the person holding the needle did not.
+        .populate('familyMemberId', 'name relation age gender')
         .populate('testIds', 'name slug code')
         .populate('packageIds', 'name slug code')
         .populate('labCenterId', 'name address geo');

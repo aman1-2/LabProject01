@@ -1,4 +1,3 @@
-// backend/src/processors/autoCancelProcessor.js
 import Booking from '../schemas/Booking.js';
 import refundService from '../services/refundService.js';
 import { emitBookingStatusUpdate } from '../sockets/socketServer.js';

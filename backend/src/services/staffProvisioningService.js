@@ -1,4 +1,3 @@
-// backend/src/services/staffProvisioningService.js
 import crypto from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { User } from '../schemas/User.js';
@@ -184,6 +183,7 @@ export async function createDoctorAccount({
   phone,
   specialization,
   clinicName,
+  clinicAddress = null,
   consultationFee,
   walkInFee,
   qualification = null,
@@ -198,14 +198,12 @@ export async function createDoctorAccount({
     createdBy,
   });
 
-  // Built then saved rather than created inline: `clinicAddress` defaults
-  // through a function reading `this.clinicName`, which only resolves on a
-  // real document.
   const doctor = await Doctor.create({
     userId: user._id,
     name: String(name).trim(),
     specialization: String(specialization).trim(),
     clinicName: String(clinicName).trim(),
+    ...(clinicAddress ? { clinicAddress: String(clinicAddress).trim() } : {}),
     consultationFee: Number(consultationFee),
     walkInFee: Number(walkInFee),
     phone: String(phone).trim(),

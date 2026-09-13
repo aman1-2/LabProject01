@@ -1,4 +1,3 @@
-// backend/src/schemas/Report.js
 import mongoose from 'mongoose';
 import './Booking.js';
 import './User.js';

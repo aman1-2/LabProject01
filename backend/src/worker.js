@@ -1,7 +1,7 @@
 import { Worker } from 'bullmq';
 import { connectDB, disconnectDB } from './config/dbConfig.js';
 import { getQueueConnection, closeRedis } from './config/redisConfig.js';
-import { assertSecretsPresent } from './config/secretsConfig.js';
+import { assertSecretsPresent, assertProductionConfig } from './config/secretsConfig.js';
 import logger from './utils/logger.js';
 
 const activeWorkers = [];
@@ -36,6 +36,7 @@ export function startWorkerQueue(queueName, processorFn) {
 async function startWorkers() {
   // Fail fast rather than starting on a guessable key (CONTEXT §11).
   assertSecretsPresent();
+  assertProductionConfig();
 
   logger.info('Starting PathCare background workers...');
 

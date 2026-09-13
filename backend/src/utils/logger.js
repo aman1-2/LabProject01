@@ -1,6 +1,5 @@
 /**
  * Structured Logger with PII Redaction
- * Conforms to PathCare Context §9 (Item 10) & §6
  */
 
 // PII & Sensitive Fields Denylist / Masking Targets

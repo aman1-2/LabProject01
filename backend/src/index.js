@@ -1,7 +1,7 @@
 import http from 'node:http';
 import createApp from './app.js';
 import serverConfig from './config/serverConfig.js';
-import { assertSecretsPresent } from './config/secretsConfig.js';
+import { assertSecretsPresent, assertProductionConfig } from './config/secretsConfig.js';
 import { connectDB, disconnectDB } from './config/dbConfig.js';
 import { closeRedis } from './config/redisConfig.js';
 import { initializeSocket } from './sockets/socketServer.js';
@@ -10,11 +10,12 @@ import logger from './utils/logger.js';
 async function startServer() {
   // Fail fast rather than starting on a guessable key (CONTEXT §11).
   assertSecretsPresent();
+  assertProductionConfig();
 
   const app = createApp();
   const server = http.createServer(app);
 
-  // Initialize Socket.IO with Redis Adapter (§6.3)
+  // Initialize Socket.IO with Redis Adapter
   initializeSocket(server);
 
   // Connect Database (non-blocking for resilient local dev)

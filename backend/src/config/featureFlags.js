@@ -1,6 +1,5 @@
 /**
  * Feature Flag Helper
- * Conforms to PathCare Context §3.5:
  * "Every new user-facing feature ships behind a flag defaulting to false."
  */
 
@@ -9,7 +8,7 @@
  * @param {Object} [options]
  * @param {boolean} [options.defaultValue=false] - Value when the env var is unset.
  *
- * §3.5 says a NEW user-facing feature ships behind a flag defaulting to false.
+ * A NEW user-facing feature ships behind a flag defaulting to false.
  * An ALREADY-SHIPPED feature is different: defaulting it to false is not a
  * rollback, it is a removal — the flag's purpose is "a rollback becomes an
  * env-var change", which needs the shipped behaviour on by default and the flag

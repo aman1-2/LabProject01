@@ -24,6 +24,15 @@ export const serverConfig = {
     .map((origin) => origin.trim())
     .filter(Boolean),
   isProduction: process.env.NODE_ENV === 'production',
+  /**
+   * Whether CORS_ORIGIN was actually configured, as opposed to falling back.
+   *
+   * The fallback above is `http://localhost:5173`. In production that is not a
+   * security hole but a total outage: the browser blocks every call from the
+   * real frontend and the app looks dead, with the cause visible only in the
+   * user's console. Asserted at boot so it fails on deploy instead.
+   */
+  corsOriginConfigured: Boolean((process.env.CORS_ORIGIN || '').trim()),
   isTest: process.env.NODE_ENV === 'test',
   // Number of proxy hops to trust for X-Forwarded-For. 1 = a single ALB in
   // front of the app. Set to 0 to disable when running without a proxy.

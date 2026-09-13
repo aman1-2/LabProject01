@@ -2,7 +2,7 @@ import { Subscription } from '../schemas/Subscription.js';
 
 /**
  * Subscription persistence. Queries only — every business rule lives in
- * subscriptionService (CONTEXT §4.4).
+ * subscriptionService.
  */
 
 export async function createSubscription(data, session = null) {
@@ -16,7 +16,7 @@ export async function findById(id) {
     .populate('labCenterId', 'name area');
 }
 
-/** Scoped to the owner: an unowned subscription must be indistinguishable from a missing one (§3.2). */
+/** Scoped to the owner: an unowned subscription must be indistinguishable from a missing one. */
 export async function findByIdAndOwner(id, patientId) {
   return Subscription.findOne({ _id: id, patientId })
     .populate('packageId', 'name slug category basePrice turnaroundHrs')

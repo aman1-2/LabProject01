@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// Doctor schema per PATHCARE_CONTEXT.md §2.2 & §5.1
 // NMC COMPLIANCE RULE: PathCare takes NO commission, pays NO referral fee, and holds NO doctor funds.
 // This model MUST NOT have earnings, commission, balance, withdrawal or payment fields.
 const doctorSchema = new mongoose.Schema(
@@ -34,12 +33,20 @@ const doctorSchema = new mongoose.Schema(
       required: [true, 'Clinic name is required'],
       trim: true,
     },
+    /**
+     * Where the clinic actually is.
+     *
+     * This used to default to `${clinicName}, Dehradun`, which put a real city
+     * on a record nobody had entered one for. Every doctor provisioned outside
+     * Dehradun carried a confidently wrong address — a patient reading it is
+     * sent to the wrong city. An address is a fact about the world; when it is
+     * not supplied the honest value is nothing, and the UI already falls back
+     * to the clinic name.
+     */
     clinicAddress: {
       type: String,
       trim: true,
-      default: function () {
-        return this.clinicName ? `${this.clinicName}, Dehradun` : 'Clinic Address, Dehradun';
-      },
+      default: null,
     },
     consultationFee: {
       type: Number,

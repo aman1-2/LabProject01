@@ -1,4 +1,3 @@
-// backend/src/controllers/labAdminController.js
 import labService from '../services/labService.js';
 import { AppError } from '../utils/AppError.js';
 

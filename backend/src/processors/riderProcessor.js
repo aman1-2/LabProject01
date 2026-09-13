@@ -1,4 +1,3 @@
-// backend/src/processors/riderProcessor.js
 import { Booking } from '../schemas/Booking.js';
 import { riderAllocationService } from '../services/riderAllocationService.js';
 import logger from '../utils/logger.js';

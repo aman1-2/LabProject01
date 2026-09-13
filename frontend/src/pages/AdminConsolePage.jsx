@@ -230,6 +230,7 @@ export function AdminConsolePage({ initialTab = 'overview' }) {
       phone: values.phone,
       specialization: values.specialization,
       clinicName: values.clinicName,
+      ...(values.clinicAddress ? { clinicAddress: values.clinicAddress } : {}),
       consultationFee: Number(values.consultationFee),
       walkInFee: Number(values.walkInFee),
       ...(values.qualification ? { qualification: values.qualification } : {}),
@@ -1026,7 +1027,13 @@ export function AdminConsolePage({ initialTab = 'overview' }) {
           },
           { name: 'phone', label: 'Mobile number', required: true, placeholder: '9876543210' },
           { name: 'specialization', label: 'Specialisation', required: true, placeholder: 'Internal Medicine' },
-          { name: 'clinicName', label: 'Clinic name', required: true, placeholder: 'Doon Clinic' },
+          { name: 'clinicName', label: 'Clinic name', required: true, placeholder: 'City Diagnostics Clinic' },
+          {
+            name: 'clinicAddress',
+            label: 'Clinic address',
+            placeholder: '14 Civil Lines, Moradabad 244001',
+            help: 'Where the patient actually goes. Left blank, the directory shows the clinic name alone — nothing is guessed.',
+          },
           { name: 'consultationFee', label: 'Consultation fee (₹)', type: 'number', required: true, placeholder: '500' },
           {
             name: 'walkInFee',

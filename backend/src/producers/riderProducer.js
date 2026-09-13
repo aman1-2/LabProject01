@@ -1,9 +1,8 @@
-// backend/src/producers/riderProducer.js
 import { getRiderQueue } from '../queues/riderQueue.js';
 import logger from '../utils/logger.js';
 
 /**
- * Enqueue rider allocation job into BullMQ per CONTEXT §6.1.
+ * Enqueue rider allocation job into BullMQ.
  * Includes graceful asynchronous event loop fallback if Redis queue is offline.
  *
  * @param {Object} params

@@ -1,4 +1,3 @@
-// backend/src/services/reportService.js
 import mongoose from 'mongoose';
 import { reportRepository } from '../repositories/reportRepository.js';
 import { Booking } from '../schemas/Booking.js';
@@ -260,6 +259,33 @@ export class ReportService {
     // Strict 404 on unowned resource per CONTEXT §3.2
     if (!isPatientOwner && !isAuthorizedLabAdmin && !isSuperAdmin) {
       throw new AppError('Booking not found', 404, 'BOOKING_NOT_FOUND');
+    }
+
+    /**
+     * Money gate. A patient may read their report only once the booking is
+     * actually paid.
+     *
+     * Nothing enforced this before: publishing a report set the booking to
+     * `report_ready` and this method handed the owner a signed S3 URL and the
+     * full summary, whatever `paymentStatus` said. A UPI booking whose payment
+     * never completed therefore delivered results for free — the QA run proved
+     * it, releasing a report on a booking sitting at `upi / pending`.
+     *
+     * Staff are exempt on purpose. A lab must be able to read what it produced
+     * in order to chase the payment, and a super admin needs it for support.
+     * The gate is on the person who owes the money, not on the people doing
+     * the work.
+     *
+     * `paid` is the only acceptable state — `refunded` must not grant access
+     * either, or cancelling and taking the refund becomes a way to read the
+     * report for nothing.
+     */
+    if (isPatientOwner && !isAuthorizedLabAdmin && !isSuperAdmin && booking.paymentStatus !== 'paid') {
+      throw new AppError(
+        'This report is ready but the booking is not paid yet. Complete the payment to view it.',
+        402,
+        'PAYMENT_PENDING'
+      );
     }
 
     const report = await reportRepository.findByBookingId(booking._id);

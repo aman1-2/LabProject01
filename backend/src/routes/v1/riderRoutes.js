@@ -1,4 +1,3 @@
-// backend/src/routes/v1/riderRoutes.js
 import express from 'express';
 import {
   updateLocation,

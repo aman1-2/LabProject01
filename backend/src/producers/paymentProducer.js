@@ -2,7 +2,7 @@ import { getPaymentQueue } from '../queues/paymentQueue.js';
 import logger from '../utils/logger.js';
 
 /**
- * Enqueue payment webhook event into BullMQ per CONTEXT §6.2.
+ * Enqueue payment webhook event into BullMQ.
  * Includes graceful asynchronous event loop fallback if Redis queue is unavailable.
  *
  * @param {Object} params

@@ -1,4 +1,3 @@
-// backend/src/repositories/reportRepository.js
 import { Report } from '../schemas/Report.js';
 
 export class ReportRepository {

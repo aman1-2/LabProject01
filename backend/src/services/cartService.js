@@ -1,4 +1,3 @@
-// backend/src/services/cartService.js
 import mongoose from 'mongoose';
 import { findTestById, findTestBySlug } from '../repositories/testRepository.js';
 import labRepository from '../repositories/labRepository.js';

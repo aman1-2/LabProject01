@@ -1,4 +1,3 @@
-// backend/src/producers/notificationProducer.js
 import { getNotificationQueue } from '../queues/notificationQueue.js';
 import logger from '../utils/logger.js';
 

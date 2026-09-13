@@ -1,4 +1,3 @@
-// backend/src/queues/subscriptionQueue.js
 import { Queue } from 'bullmq';
 import { getQueueConnection } from '../config/redisConfig.js';
 import { SUBSCRIPTION_CONFIG } from '../config/subscriptionConfig.js';

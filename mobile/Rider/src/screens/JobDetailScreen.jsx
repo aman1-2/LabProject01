@@ -89,6 +89,20 @@ export default function JobDetailScreen({ navigation, route }) {
   const handedOff = ['at_lab', 'processing', 'report_ready', 'completed'].includes(job.status);
 
   /**
+   * Present only when the booking was placed for someone other than the
+   * account holder. `familyMemberId` is populated by the API on the claimed
+   * job only — an unclaimed job deliberately carries no identity at all.
+   */
+  const familyMember = job?.familyMemberId && typeof job.familyMemberId === 'object'
+    ? job.familyMemberId
+    : null;
+  const familyMemberMeta = familyMember
+    ? [familyMember.relation, familyMember.gender, familyMember.age ? `${familyMember.age} yrs` : null]
+        .filter(Boolean)
+        .join(' · ')
+    : '';
+
+  /**
    * The journey, and where along it this job sits.
    *
    * Built from the same flags the actions below use, so the dots and the
@@ -135,7 +149,27 @@ export default function JobDetailScreen({ navigation, route }) {
 
         <Card style={[card.padded, styles.card]} testID="card-patient">
           <Text style={styles.cardHeading}>Patient</Text>
-          <KeyValue label="Name" value={job.patientId?.name || 'Not provided'} testID="kv-patient-name" />
+
+          {/* A booking can be placed by one person FOR another — a spouse, a
+              child, an elderly parent. The account holder is then the contact,
+              not the person to draw from. Showing only the account holder's
+              name invites the rider to draw from the wrong person and label it
+              against this booking, which puts one person's results on another
+              person's record. So when the two differ, say so plainly and put
+              the person being drawn from first. */}
+          {familyMember ? (
+            <View testID="banner-draw-from" style={styles.drawFrom}>
+              <Text style={styles.drawFromLabel}>SAMPLE FROM</Text>
+              <Text style={styles.drawFromName}>{familyMember.name}</Text>
+              <Text style={styles.drawFromMeta}>{familyMemberMeta}</Text>
+            </View>
+          ) : null}
+
+          <KeyValue
+            label={familyMember ? 'Booked by (contact)' : 'Name'}
+            value={job.patientId?.name || 'Not provided'}
+            testID="kv-patient-name"
+          />
           <KeyValue label="Phone" value={job.patientId?.phone || 'Not provided'} testID="kv-patient-phone" />
           {job.patientId?.phone ? (
             <GhostButton
@@ -229,6 +263,18 @@ export default function JobDetailScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  drawFrom: {
+    backgroundColor: colors.amberBg,
+    borderWidth: 1.5,
+    borderColor: colors.amber,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 14,
+  },
+  drawFromLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, color: colors.amberDark },
+  drawFromName: { fontSize: 19, fontWeight: '800', color: colors.ink, marginTop: 3 },
+  drawFromMeta: { fontSize: 13, color: colors.muted, marginTop: 2 },
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
   reference: { ...type.meta, marginTop: 2, marginBottom: 18 },
   card: { marginBottom: 14, gap: 4 },

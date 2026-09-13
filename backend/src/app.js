@@ -13,7 +13,7 @@ import { getHealth } from './controllers/healthController.js';
 export function createApp() {
   const app = express();
 
-  // Behind the ALB (CONTEXT §4.2) the peer address is the load balancer, so
+  // Behind the ALB the peer address is the load balancer, so
   // req.ip would be identical for every caller and the per-IP limiter would
   // throttle all users as one bucket. Trusting the proxy makes req.ip the real
   // client address from X-Forwarded-For.
@@ -48,8 +48,8 @@ export function createApp() {
   // Request logging with PII redaction
   app.use(requestLogger);
 
-  // Global rate limiting per CONTEXT §8, mounted BEFORE the routers so it
-  // covers every endpoint. Exempts the payment webhook (§3.3).
+  // Global rate limiting, mounted BEFORE the routers so it
+  // covers every endpoint. Exempts the payment webhook.
   app.use(globalRateLimiter);
 
   // Health endpoint root mapping

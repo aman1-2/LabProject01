@@ -271,6 +271,12 @@ async function addressFor(token) {
         editLog: [{ editedBy: new mongoose.Types.ObjectId(), editedAt: new Date(), changeReason: 'Initial creation' }],
       });
 
+      // The report view is gated on payment, and this cash booking is still
+      // `pending`. That is incidental here — this test is about attribution,
+      // not money — so settle it explicitly rather than let an unrelated
+      // precondition decide the result.
+      await Booking.updateOne({ _id: bookingId }, { $set: { paymentStatus: 'paid' } });
+
       // 4. Verify account owner can view the report
       const reportRes = await request(app)
         .get(`/api/reports/${bookingId}`)

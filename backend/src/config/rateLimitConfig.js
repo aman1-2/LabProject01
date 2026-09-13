@@ -10,7 +10,6 @@ function intFromEnv(name, fallback) {
 }
 
 /**
- * Rate limits per PATHCARE_CONTEXT.md §8, environment-overridable per §3.4.
  *
  * | Scope                     | Limit   | Window  |
  * | ------------------------- | ------- | ------- |
@@ -47,7 +46,7 @@ export const RATE_LIMITS = {
 /**
  * Paths the global limiter must NEVER throttle.
  *
- * CONTEXT §3.3: "Never rate-limit the payment webhook." Razorpay retries
+ * "Never rate-limit the payment webhook." Razorpay retries
  * aggressively and a 429 there loses payment state. Matched as a path segment
  * so it holds under both the /api and /api/v1 mounts.
  */

@@ -1,4 +1,3 @@
-// backend/src/services/statusTransitionService.js
 import Booking from '../schemas/Booking.js';
 import Rider from '../schemas/Rider.js';
 import { emitBookingStatusUpdate } from '../sockets/socketServer.js';

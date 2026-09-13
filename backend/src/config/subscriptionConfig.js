@@ -1,7 +1,7 @@
 /**
  * Subscription tunables.
  *
- * CONTEXT §3.4: no magic numbers in business logic. Every value here is
+ * no magic numbers in business logic. Every value here is
  * environment-overridable so a change is a deploy variable, not a code change.
  */
 export const SUBSCRIPTION_CONFIG = {

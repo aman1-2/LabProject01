@@ -224,7 +224,7 @@ export function DoctorProfilePage() {
                 <div className="flex justify-between border-b border-border pb-2.5">
                   <span className="text-muted font-medium">Address</span>
                   <span className="text-ink font-bold text-right max-w-[280px]">
-                    {doctor.clinicAddress}
+                    {doctor.clinicAddress || doctor.clinicName}
                   </span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2.5">

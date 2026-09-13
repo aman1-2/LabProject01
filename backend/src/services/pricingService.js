@@ -1,6 +1,3 @@
-// backend/src/services/pricingService.js
-// Pure server-side pricing computation per PATHCARE_CONTEXT.md §5.1
-
 /**
  * Calculates final booking price given tests/packages and the selected lab multiplier.
  * Formula: Math.round(basePrice * multiplier)

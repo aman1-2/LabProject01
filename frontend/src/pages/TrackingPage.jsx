@@ -25,6 +25,7 @@ export function TrackingPage() {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [reportData, setReportData] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
+  const [reportBlocked, setReportBlocked] = useState(null);
 
   // Track whether a disconnect occurred to trigger REST recovery upon reconnect
   const hasDisconnectedRef = useRef(false);
@@ -36,8 +37,19 @@ export function TrackingPage() {
       setReportLoading(true);
       const res = await api.get(`/api/reports/${bId}`);
       setReportData(res.data?.data || null);
-    } catch {
+      setReportBlocked(null);
+    } catch (err) {
       setReportData(null);
+      // A report withheld for non-payment is not an error to swallow. Without
+      // this the tracker says "report ready" and then shows nothing at all,
+      // which reads as the site being broken rather than as money being owed.
+      const code = err.response?.data?.error?.code;
+      setReportBlocked(
+        code === 'PAYMENT_PENDING'
+          ? err.response?.data?.error?.message ||
+              'This report is ready but the booking is not paid yet.'
+          : null
+      );
     } finally {
       setReportLoading(false);
     }
@@ -405,7 +417,15 @@ export function TrackingPage() {
                     </p>
 
                     {/* Lab Summary */}
-                    {reportData?.summaryHtml ? (
+                    {reportBlocked ? (
+                      <div
+                        data-testid="report-payment-pending"
+                        className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4"
+                      >
+                        <p className="text-sm font-extrabold text-amber-900">Payment pending</p>
+                        <p className="mt-1 text-sm text-amber-900/80">{reportBlocked}</p>
+                      </div>
+                    ) : reportData?.summaryHtml ? (
                       <div className="bg-white rounded-xl p-3.5 text-[13px] leading-relaxed mb-3 border border-border/60" data-testid="lab-summary-box">
                         <div className="flex justify-between items-center mb-1.5">
                           <p className="font-bold text-[11px] text-muted uppercase tracking-wider">

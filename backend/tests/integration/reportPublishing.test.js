@@ -404,6 +404,96 @@ describe('Report Upload & Lab-Written Summary Integration Tests', () => {
       expect(data.recommendationReason).toBe('Consult Dr. Verma for preventive care advice.');
     });
 
+    /**
+     * A report is the thing the patient is paying for. Releasing it before the
+     * money arrives gives it away.
+     *
+     * This was live: publishing set the booking to `report_ready` and the
+     * patient view handed back a signed S3 URL and the full summary without
+     * ever looking at `paymentStatus`. A QA run read a complete report on a
+     * booking sitting at `upi / pending`.
+     */
+    describe('payment gate on the patient view', () => {
+      async function publishFor(booking) {
+        return request(app)
+          .post(`/api/lab/reports/${booking._id}/publish`)
+          .set('Authorization', `Bearer ${labAdminToken}`)
+          .send({
+            pdfKey: `reports/${labCenter._id}/${booking._id}/report.pdf`,
+            summaryHtml: '<p>Values within range.</p>',
+          });
+      }
+
+      it('refuses the patient a report on an unpaid booking', async () => {
+        const booking = await createAtLabBooking();
+        await Booking.updateOne({ _id: booking._id }, { $set: { paymentStatus: 'pending' } });
+        await publishFor(booking);
+
+        const res = await request(app)
+          .get(`/api/reports/${booking._id}`)
+          .set('Authorization', `Bearer ${patientToken}`);
+
+        expect(res.status).toBe(402);
+        expect(res.body.error.code).toBe('PAYMENT_PENDING');
+        // The whole point: no summary and no signed URL escape with the refusal.
+        expect(JSON.stringify(res.body)).not.toContain('X-Amz-Signature');
+        expect(JSON.stringify(res.body)).not.toContain('Values within range');
+      });
+
+      it('refuses it on a refunded booking too, so cancelling is not a free read', async () => {
+        const booking = await createAtLabBooking();
+        await Booking.updateOne({ _id: booking._id }, { $set: { paymentStatus: 'refunded' } });
+        await publishFor(booking);
+
+        const res = await request(app)
+          .get(`/api/reports/${booking._id}`)
+          .set('Authorization', `Bearer ${patientToken}`);
+
+        expect(res.status).toBe(402);
+        expect(res.body.error.code).toBe('PAYMENT_PENDING');
+      });
+
+      it('releases it once the booking is paid', async () => {
+        const booking = await createAtLabBooking();
+        await Booking.updateOne({ _id: booking._id }, { $set: { paymentStatus: 'pending' } });
+        await publishFor(booking);
+
+        await Booking.updateOne({ _id: booking._id }, { $set: { paymentStatus: 'paid' } });
+
+        const res = await request(app)
+          .get(`/api/reports/${booking._id}`)
+          .set('Authorization', `Bearer ${patientToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.downloadUrl).toContain('X-Amz-Signature');
+      });
+
+      it('still lets the owning lab admin read an unpaid report, to chase the payment', async () => {
+        const booking = await createAtLabBooking();
+        await Booking.updateOne({ _id: booking._id }, { $set: { paymentStatus: 'pending' } });
+        await publishFor(booking);
+
+        const res = await request(app)
+          .get(`/api/reports/${booking._id}`)
+          .set('Authorization', `Bearer ${labAdminToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.data.downloadUrl).toBeDefined();
+      });
+
+      it('hides existence from a stranger with 404, never 402', async () => {
+        const booking = await createAtLabBooking();
+        await Booking.updateOne({ _id: booking._id }, { $set: { paymentStatus: 'pending' } });
+        await publishFor(booking);
+
+        const res = await request(app)
+          .get(`/api/reports/${booking._id}`)
+          .set('Authorization', `Bearer ${otherPatientToken}`);
+
+        expect(res.status).toBe(404);
+      });
+    });
+
     it('Integration: ownership — user A cannot fetch user B report (returns 404)', async () => {
       const booking = await createAtLabBooking();
 
@@ -576,9 +666,35 @@ describe('Report Upload & Lab-Written Summary Integration Tests', () => {
   // every time, so lab admins saw uploads that always failed and patients got
   // download links that 403'd on a report the app said was ready (CONTEXT §11).
   describe('HIGH H8 -- storage failures surface instead of fabricating a URL', () => {
+    /**
+     * "Unconfigured" has to be made true here, not assumed.
+     *
+     * These tests used to inherit it from the developer's `.env` simply having
+     * placeholder AWS values. The moment real credentials were added, storage
+     * became configured, presigning succeeded, and both tests failed — the
+     * suite was asserting a property of one machine's environment rather than
+     * of the code. Clearing the variables makes the precondition explicit and
+     * the result the same on any machine and in CI.
+     */
+    const AWS_VARS = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
+    let savedAws;
+
+    beforeEach(() => {
+      savedAws = Object.fromEntries(AWS_VARS.map((k) => [k, process.env[k]]));
+      for (const k of AWS_VARS) delete process.env[k];
+    });
+
+    afterEach(() => {
+      for (const [k, v] of Object.entries(savedAws)) {
+        if (v === undefined) delete process.env[k];
+        else process.env[k] = v;
+      }
+    });
+
     it('returns 503 rather than a fake upload URL when storage is unconfigured', async () => {
       const booking = await createAtLabBooking();
-      // No stubStorage() here: exercise the real, unconfigured storage layer.
+      // No stubStorage() here: exercise the real storage layer, with the
+      // credentials removed above so it is genuinely unconfigured.
 
       const res = await request(app)
         .post(`/api/lab/reports/${booking._id}/upload-url`)

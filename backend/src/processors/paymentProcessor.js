@@ -4,7 +4,6 @@ import subscriptionService from '../services/subscriptionService.js';
 
 /**
  * Core processor for Razorpay payment webhook jobs
- * Conforms to PATHCARE_CONTEXT.md §6.2.
  *
  * @param {Object} job - BullMQ job containing { event }
  * @returns {Promise<Object>}

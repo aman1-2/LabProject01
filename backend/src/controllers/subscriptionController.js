@@ -2,7 +2,7 @@ import subscriptionService from '../services/subscriptionService.js';
 
 /**
  * Controllers parse the request, call ONE service, and shape the response.
- * No business rules here (CONTEXT §4.4).
+ * No business rules here.
  */
 
 export async function createSubscription(req, res, next) {

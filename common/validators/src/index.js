@@ -381,6 +381,9 @@ export const createDoctorAccountSchema = z.object({
   ...staffIdentitySchema,
   specialization: z.string().min(2, 'Specialisation is required').max(120),
   clinicName: z.string().min(2, 'Clinic name is required').max(160),
+  // Optional, but it is the only way a real address ever reaches the record:
+  // nothing derives one, and the schema no longer invents a city.
+  clinicAddress: z.string().min(4).max(240).optional().nullable(),
   consultationFee: z.coerce.number().min(0).max(100000),
   walkInFee: z.coerce.number().min(0).max(100000),
   qualification: z.string().max(160).optional().nullable(),

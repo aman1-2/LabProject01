@@ -1,4 +1,3 @@
-// backend/src/routes/v1/reportRoutes.js
 import express from 'express';
 import {
   getReportUploadUrl,

@@ -1,4 +1,3 @@
-// backend/src/queues/notificationQueue.js
 import { Queue } from 'bullmq';
 import { getQueueConnection } from '../config/redisConfig.js';
 import logger from '../utils/logger.js';

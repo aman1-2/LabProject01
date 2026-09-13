@@ -1,4 +1,3 @@
-// backend/src/routes/v1/labAdminRoutes.js
 import express from 'express';
 import { isAuthenticated, hasRole } from '../../middlewares/authMiddleware.js';
 import { validateQuery } from '../../middlewares/validateRequest.js';

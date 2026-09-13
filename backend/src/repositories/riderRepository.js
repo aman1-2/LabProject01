@@ -1,4 +1,3 @@
-// backend/src/repositories/riderRepository.js
 import Rider from '../schemas/Rider.js';
 
 export class RiderRepository {

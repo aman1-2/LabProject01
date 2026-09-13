@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 /**
- * Feedback Schema per PATHCARE_CONTEXT.md §5.1 & prototype line 988
  * Patient feedback collected after booking completion,
  * including interest in medicine pick-and-drop service.
  */

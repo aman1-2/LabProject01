@@ -83,7 +83,7 @@ export async function processSubscriptionSweepJob() {
         userId: subscription.patientId,
         title: 'Upcoming payment',
         // Plain language, and it states amount and date because the point of
-        // the notice is that the patient can stop it (DESIGN_SPEC §6).
+        // the notice is that the patient can stop it.
         body: `₹${subscription.amount.toLocaleString('en-IN')} for ${packageName} will be debited on ${chargeDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}. You can pause or cancel before then.`,
         data: {
           type: 'SUBSCRIPTION_PRE_DEBIT',

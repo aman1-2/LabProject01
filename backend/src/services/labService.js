@@ -1,4 +1,3 @@
-// backend/src/services/labService.js
 import mongoose from 'mongoose';
 import Booking from '../schemas/Booking.js';
 import LabCenter from '../schemas/LabCenter.js';

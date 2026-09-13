@@ -94,6 +94,23 @@ export function onceWithTimeout(emitter, event, { timeoutMs = 15000 } = {}) {
       emitter.off?.('connect_error', onError);
     }
 
+    /**
+     * A socket that connected before this listener was attached will never
+     * emit `connect` again, and `once` would wait out the full timeout on a
+     * connection that actually succeeded.
+     *
+     * Tests create two clients together and then await them one after the
+     * other, so the second is frequently already up by the time we look at it.
+     * That reported as "Timed out after 30000ms waiting for socket event
+     * 'connect'" — indistinguishable from a server that never answered, and
+     * intermittent, because it depends on which side wins the race.
+     */
+    if (event === 'connect' && emitter.connected) {
+      cleanup();
+      resolve();
+      return;
+    }
+
     emitter.once(event, onEvent);
     if (event === 'connect') {
       emitter.once('connect_error', onError);

@@ -5,7 +5,7 @@ import authService from '../services/authService.js';
 // running on the page and defeats the point of httpOnly.
 //
 // Native clients are a genuine exception: an Expo app has no cookie jar we
-// control, and CONTEXT §7.3 requires tokens to live in `expo-secure-store` (the
+// control, and requires tokens to live in `expo-secure-store` (the
 // OS keystore), so the token has to arrive in the body or the mobile apps
 // cannot hold a session at all. There is no DOM and no third-party script in a
 // native app, so the XSS threat the httpOnly cookie defends against is absent.

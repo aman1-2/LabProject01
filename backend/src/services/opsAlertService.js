@@ -1,4 +1,3 @@
-// backend/src/services/opsAlertService.js
 import logger from '../utils/logger.js';
 
 export class OpsAlertService {

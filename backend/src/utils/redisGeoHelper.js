@@ -1,4 +1,3 @@
-// backend/src/utils/redisGeoHelper.js
 import { getRedisClient } from '../config/redisConfig.js';
 import logger from './logger.js';
 

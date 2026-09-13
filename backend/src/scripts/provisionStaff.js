@@ -64,6 +64,7 @@ export async function provisionStaff({
   labName = null,
   specialization = null,
   clinicName = null,
+  clinicAddress = null,
   consultationFee = null,
   walkInFee = null,
   qualification = null,
@@ -143,6 +144,7 @@ export async function provisionStaff({
       name: String(name).trim(),
       specialization: String(specialization).trim(),
       clinicName: String(clinicName).trim(),
+    ...(clinicAddress ? { clinicAddress: String(clinicAddress).trim() } : {}),
       consultationFee: Number(consultationFee),
       walkInFee: Number(walkInFee),
       phone: cleanPhone,
@@ -154,8 +156,8 @@ export async function provisionStaff({
       isVerified: false,
     };
 
-    // Find-then-save rather than an upsert. `clinicAddress` defaults through a
-    // function that reads `this.clinicName`, and on an upsert `this` is not a
+    // Find-then-save rather than an upsert, so document defaults and
+    // validators run against a real document rather than an update where `this` is not a
     // document — the default never resolves and the insert produces nothing.
     doctor = await Doctor.findOne({ userId: user._id });
     if (doctor) {
@@ -185,7 +187,7 @@ async function main() {
       'usage: node src/scripts/provisionStaff.js --role <super_admin|lab_admin|doctor> \\\n' +
         '         --handle <handle> --phone <10 digits> --name "<full name>" --password <password>\n' +
         '       lab_admin also needs --lab "<centre name>"\n' +
-        '       doctor also needs --specialization --clinic --fee --walkInFee [--activate]'
+        '       doctor also needs --specialization --clinic --fee --walkInFee [--clinic-address] [--activate]'
     );
     process.exitCode = 1;
     return;
@@ -203,6 +205,7 @@ async function main() {
       labName: args.lab ?? null,
       specialization: args.specialization ?? null,
       clinicName: args.clinic ?? null,
+      clinicAddress: args['clinic-address'] ?? null,
       consultationFee: args.fee ?? null,
       walkInFee: args.walkInFee ?? null,
       qualification: args.qualification ?? null,
@@ -216,6 +219,7 @@ async function main() {
     if (labCenter) console.log(`    centre : ${labCenter.name}`);
     if (doctor) {
       console.log(`    clinic : ${doctor.clinicName} (${doctor.specialization})`);
+      console.log(`    address: ${doctor.clinicAddress ?? '(not supplied — directory will show the clinic name)'}`);
       console.log(`    listed : ${doctor.isActive ? 'YES — visible to patients' : 'no (inactive)'}`);
     }
     console.log('    The password is the one you passed on the command line.\n');

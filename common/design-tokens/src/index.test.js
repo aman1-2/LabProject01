@@ -124,6 +124,9 @@ test('font family is Plus Jakarta Sans with a real fallback stack', () => {
 
 test('the aggregate tokens object exposes every group', () => {
   assert.deepStrictEqual(Object.keys(tokens).sort(), [
+    // The avatar palette is a token group like any other: web and mobile both
+    // pick a person's colour from it, so the two must never diverge.
+    'avatarColors',
     'colors',
     'fontFamily',
     'radius',

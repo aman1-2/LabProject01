@@ -6,6 +6,7 @@ import {
   REQUIRED_SECRETS,
   resolveSecret,
   assertSecretsPresent,
+  assertProductionConfig,
 } from '../../src/config/secretsConfig.js';
 
 /**
@@ -158,5 +159,76 @@ describe('Secrets are required, never defaulted (BLOCKER #11)', () => {
 
       expect(offenders).toEqual([]);
     });
+  });
+});
+
+/**
+ * These guards exist because a production deploy is configured by copying
+ * `.env.example` and filling it in. Whatever is left unfilled must stop the
+ * process, not run with a value published in this repository.
+ */
+describe('production configuration is refused when unusable', () => {
+  const BASE = {
+    NODE_ENV: 'production',
+    JWT_SECRET: 'a-real-32-character-secret-value-x',
+    RAZORPAY_KEY_ID: 'rzp_live_ABC123',
+    RAZORPAY_KEY_SECRET: 'a-real-32-character-secret-value',
+    RAZORPAY_WEBHOOK_SECRET: 'a-real-32-character-secret-value',
+    STORAGE_SIGNING_SECRET: 'a-real-32-character-secret-value',
+    CORS_ORIGIN: 'https://app.pathcare.in',
+    MONGODB_URI: 'mongodb+srv://u:p@c0.abc.mongodb.net/pathcare?retryWrites=true',
+  };
+
+  let saved;
+  beforeEach(() => {
+    saved = { ...process.env };
+    Object.assign(process.env, BASE);
+  });
+  afterEach(() => {
+    for (const k of Object.keys(process.env)) if (!(k in saved)) delete process.env[k];
+    Object.assign(process.env, saved);
+  });
+
+  it('accepts a fully valid production configuration', () => {
+    expect(() => assertSecretsPresent()).not.toThrow();
+    expect(() => assertProductionConfig()).not.toThrow();
+  });
+
+  it('refuses a secret left at its .env.example placeholder', () => {
+    process.env.RAZORPAY_WEBHOOK_SECRET = 'your_razorpay_webhook_secret';
+    expect(() => assertSecretsPresent()).toThrow(/placeholder/i);
+  });
+
+  it('refuses a test Razorpay key in production', () => {
+    process.env.RAZORPAY_KEY_ID = 'rzp_test_ABC123';
+    expect(() => assertSecretsPresent()).toThrow(/TEST key/i);
+  });
+
+  it('refuses a secret too short to be real', () => {
+    process.env.JWT_SECRET = 'short123';
+    expect(() => assertSecretsPresent()).toThrow(/shorter than/i);
+  });
+
+  it('refuses an unset CORS_ORIGIN, which would silently block the real frontend', () => {
+    delete process.env.CORS_ORIGIN;
+    expect(() => assertProductionConfig()).toThrow(/CORS_ORIGIN/);
+  });
+
+  it('refuses a CORS_ORIGIN still pointing at localhost', () => {
+    process.env.CORS_ORIGIN = 'http://localhost:5173';
+    expect(() => assertProductionConfig()).toThrow(/local address/i);
+  });
+
+  it('refuses a Mongo URI with no database name, which silently becomes "test"', () => {
+    process.env.MONGODB_URI = 'mongodb+srv://u:p@c0.abc.mongodb.net/?appName=X';
+    expect(() => assertProductionConfig()).toThrow(/names no database/i);
+  });
+
+  it('leaves non-production runs alone', () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.CORS_ORIGIN;
+    process.env.RAZORPAY_WEBHOOK_SECRET = 'your_razorpay_webhook_secret';
+    expect(() => assertSecretsPresent()).not.toThrow();
+    expect(() => assertProductionConfig()).not.toThrow();
   });
 });

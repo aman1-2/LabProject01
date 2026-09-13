@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 /**
- * DailyStats Schema per PATHCARE_CONTEXT.md §5.1 & prompt
  * Nightly rollup snapshot of key business and operational metrics.
  * Idempotently computed per date.
  */

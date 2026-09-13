@@ -5,7 +5,6 @@ import { enqueuePaymentWebhookEvent } from '../producers/paymentProducer.js';
 import logger from '../utils/logger.js';
 
 /**
- * Handle incoming Razorpay webhooks per PATHCARE_CONTEXT.md §6.2.
  * Invariants:
  * 1. Verify HMAC over rawBody
  * 2. Return 200 immediately (ACK)
@@ -26,7 +25,7 @@ export async function handleRazorpayWebhook(req, res, next) {
     // 2. Return 200 IMMEDIATELY (ACK)
     res.status(200).send('ok');
 
-    // 3. Dedupe on event id — a repeat delivery is a no-op (CONTEXT §3.3).
+    // 3. Dedupe on event id — a repeat delivery is a no-op .
     //
     // Razorpay sends the event identifier in the x-razorpay-event-id HEADER.
     // The body carries `event`, `payload`, `created_at` and `account_id` but no

@@ -1,4 +1,3 @@
-// backend/src/services/pushNotificationService.js
 import { User } from '../schemas/User.js';
 import { isFeatureEnabled } from '../config/featureFlags.js';
 import { AppError } from '../utils/AppError.js';

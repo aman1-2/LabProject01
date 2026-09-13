@@ -1,4 +1,3 @@
-// backend/src/utils/barcodeGenerator.js
 import crypto from 'crypto';
 
 /**

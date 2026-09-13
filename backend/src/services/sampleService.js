@@ -1,4 +1,3 @@
-// backend/src/services/sampleService.js
 import mongoose from 'mongoose';
 import { sampleRepository } from '../repositories/sampleRepository.js';
 import { riderRepository } from '../repositories/riderRepository.js';

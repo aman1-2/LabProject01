@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { connectDB } from '../config/dbConfig.js';
 import { TestCatalog } from '../schemas/TestCatalog.js';
 import { LabCenter } from '../schemas/LabCenter.js';
+import { decode } from '../utils/openLocationCode.js';
 import logger from '../utils/logger.js';
 
 dotenv.config();
@@ -30,6 +31,24 @@ export async function seedCatalogue({ allowProduction = false } = {}) {
   }
   logger.info(`Seeded ${REAL_TESTS.length} tests and packages successfully`);
 
+  // A lab's coordinates are derived from its Plus Code, so the two must agree.
+  // Checking here means a hand-edited coordinate — the easy way to put a
+  // phlebotomist on the wrong road — fails the seed instead of shipping.
+  for (const labData of REAL_LABS) {
+    if (labData.plusCode) {
+      const box = decode(labData.plusCode);
+      const [lng, lat] = labData.geo.coordinates;
+      const drift = Math.max(Math.abs(lat - box.latCenter), Math.abs(lng - box.lngCenter));
+      if (drift > 1e-6) {
+        throw new Error(
+          `${labData.name}: geo does not match plusCode ${labData.plusCode}. ` +
+            `Code decodes to ${box.latCenter.toFixed(6)}, ${box.lngCenter.toFixed(6)} ` +
+            `but geo says ${lat}, ${lng}.`
+        );
+      }
+    }
+  }
+
   for (const labData of REAL_LABS) {
     await LabCenter.findOneAndUpdate(
       { name: labData.name, area: labData.area },
@@ -37,7 +56,7 @@ export async function seedCatalogue({ allowProduction = false } = {}) {
       { upsert: true, new: true, runValidators: true }
     );
   }
-  logger.info(`Seeded ${REAL_LABS.length} Dehradun lab centres successfully`);
+  logger.info(`Seeded ${REAL_LABS.length} lab centres successfully`);
 
   // Partner doctors are deliberately NOT seeded.
   //

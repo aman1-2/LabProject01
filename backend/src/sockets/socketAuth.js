@@ -1,7 +1,5 @@
-// backend/src/sockets/socketAuth.js
-//
 // Socket.IO authentication and per-room authorisation.
-//
+
 // Lives in its own module rather than in socketServer.js because three services
 // (bookingService, statusTransitionService, riderAllocationService) import
 // socketServer for its emitters. Importing those services back would create a

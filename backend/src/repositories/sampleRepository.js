@@ -1,4 +1,3 @@
-// backend/src/repositories/sampleRepository.js
 import { Sample } from '../schemas/Sample.js';
 
 export class SampleRepository {

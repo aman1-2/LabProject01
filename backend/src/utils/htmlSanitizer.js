@@ -1,4 +1,3 @@
-// backend/src/utils/htmlSanitizer.js
 import sanitizeHtml from 'sanitize-html';
 
 /**

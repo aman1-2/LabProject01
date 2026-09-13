@@ -1,10 +1,9 @@
-// backend/src/processors/notificationProcessor.js
 import { sendPushToUser } from '../services/pushNotificationService.js';
 import logger from '../utils/logger.js';
 
 /**
  * Delivers one queued push. Runs in the worker process, so a slow or failing
- * push service never blocks a request handler (CONTEXT §10).
+ * push service never blocks a request handler.
  */
 export async function processNotificationJob(job) {
   const { userId, title, body, data } = job.data || {};
