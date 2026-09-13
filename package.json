@@ -2,6 +2,7 @@
   "name": "pathcare",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.25.0",
   "description": "PathCare On-demand Pathology and Diagnostics Platform",
   "type": "module",
   "scripts": {
