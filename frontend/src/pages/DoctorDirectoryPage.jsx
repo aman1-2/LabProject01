@@ -8,6 +8,7 @@ import EmptyState from '../components/atoms/EmptyState.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 
+import { CITY } from '../lib/locale.js';
 // Generate consistent avatar background color from name per prototype col()
 function getAvatarColor(name = '') {
   const colors = [
@@ -93,7 +94,7 @@ export function DoctorDirectoryPage() {
         <div className="mb-8">
           <h1 className="text-[28px] font-extrabold text-ink mb-2">Find a Doctor</h1>
           <p className="text-body text-muted leading-relaxed max-w-[700px]">
-            Consult verified specialists across Dehradun. Pay directly at the clinic — zero booking fees, no commission.
+            Consult verified specialists across {CITY}. Pay directly at the clinic — zero booking fees, no commission.
           </p>
         </div>
 
@@ -152,7 +153,7 @@ export function DoctorDirectoryPage() {
           <EmptyState
             icon="search"
             title="No doctors in this speciality yet"
-            body="We are onboarding partner doctors across Dehradun."
+            body={`We are onboarding partner doctors across ${CITY}.`}
             ctaText="See all"
             onCtaClick={() => setSelectedSpecialty('all')}
           />

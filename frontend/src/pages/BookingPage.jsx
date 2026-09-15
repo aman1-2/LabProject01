@@ -13,6 +13,7 @@ import { fetchTestBySlug, fetchNearbyLabs, fetchDoctors, fetchCartQuote } from '
 import { useCart } from '../context/CartContext.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 
+import { CITY } from '../lib/locale.js';
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -275,8 +276,28 @@ export default function BookingPage() {
 
   // Handle Booking submission & Razorpay Checkout
   const handleConfirmBooking = async () => {
-    if (!test || !selectedLab) return;
     if (isSubmitting) return;
+
+    /**
+     * Say why nothing happened.
+     *
+     * These were a bare `return`, so a patient outside the service radius
+     * clicked "Pay & confirm" and got no spinner, no message, nothing at all
+     * — the button simply looked broken. `selectedLab` resolves to `labs[0]`,
+     * so an empty lab list (every lab further than the search radius) lands
+     * here, which is precisely the case a real user in an unserved town hits.
+     */
+    if (!test) {
+      setSubmitError('We could not load this test. Please go back and pick it again.');
+      return;
+    }
+    if (!selectedLab) {
+      setSubmitError(
+        'No partner lab serves your saved address yet, so this booking cannot be placed. ' +
+          'Try a different address from your profile, or contact us if you think this is wrong.'
+      );
+      return;
+    }
 
     setSubmitError('');
     setIsSubmitting(true);
@@ -621,6 +642,25 @@ export default function BookingPage() {
             {/* STEP 2: Choose a lab */}
             <Card className="p-5 sm:p-6 mb-4 border border-border">
               <p className="font-extrabold text-[15px] text-ink mb-3.5">2 · Choose a lab</p>
+
+              {/* An empty list used to render as an empty box, which reads as
+                  "still loading" rather than "there is nothing here". Without
+                  a lab there is no booking to place, so say so where the user
+                  is looking instead of letting them reach the pay button and
+                  find it inert. */}
+              {labs.length === 0 ? (
+                <div
+                  data-testid="no-labs-in-range"
+                  className="rounded-lg border border-amber bg-amberBg px-4 py-3.5"
+                >
+                  <p className="text-sm font-bold text-ink">No partner lab covers your address yet</p>
+                  <p className="mt-1 text-xs text-muted">
+                    We are in {CITY} and expanding. Change the service address on your profile if you
+                    are nearer one of our labs, or check back soon.
+                  </p>
+                </div>
+              ) : null}
+
               <div className="space-y-2.5">
                 {labs.map((lab) => {
                   const labPrice = Math.round(test.basePrice * (lab.priceMultiplier || 1.0));
@@ -752,7 +792,7 @@ export default function BookingPage() {
                       <option value="">Select a partner doctor...</option>
                       {partnerDoctors.map((doc) => (
                         <option key={doc._id} value={doc._id}>
-                          {doc.name} — {doc.specialization} ({doc.clinicName || 'Dehradun'})
+                          {doc.name} — {doc.specialization} ({doc.clinicName || CITY})
                         </option>
                       ))}
                     </select>
@@ -899,6 +939,20 @@ export default function BookingPage() {
                   </p>
                 )}
               </div>
+
+              {/* The same error also renders at the top of the flow, which on
+                  a phone is several screens above this button — so a failure
+                  here would still look like nothing happened. Repeat it where
+                  the click was. */}
+              {submitError && (
+                <div
+                  data-testid="confirm-error"
+                  className="mb-3 flex items-start gap-2 rounded-lg border border-red bg-redBg p-3 text-xs text-redDark"
+                >
+                  <Icon name="alert" size={14} className="mt-0.5 inline-block shrink-0" />
+                  <span>{submitError}</span>
+                </div>
+              )}
 
               {/* Confirm Pill Button */}
               <Button

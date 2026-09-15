@@ -6,6 +6,7 @@ import { AuthProvider } from '../src/context/AuthContext.jsx';
 import { CartProvider } from '../src/context/CartContext.jsx';
 import AuthPage from '../src/pages/AuthPage.jsx';
 
+import { CITY } from '../src/lib/locale.js';
 function renderAuthPage() {
   return render(
     <BrowserRouter>
@@ -24,7 +25,7 @@ describe('AuthPage Component', () => {
 
     // The brand panel leads with where the service actually operates, which is
     // checkable, rather than a slogan.
-    expect(screen.getByText(/Now live in Dehradun/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Now live in ${CITY}`, 'i'))).toBeInTheDocument();
     expect(screen.getByTestId('signin-tab')).toBeInTheDocument();
     expect(screen.getByTestId('signup-tab')).toBeInTheDocument();
   });

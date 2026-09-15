@@ -10,6 +10,7 @@ import DoctorProfilePage from '../src/pages/DoctorProfilePage.jsx';
 import DoctorDashboardPage from '../src/pages/DoctorDashboardPage.jsx';
 import PartnerApplyPage from '../src/pages/PartnerApplyPage.jsx';
 
+import { CITY } from '../src/lib/locale.js';
 describe('Doctor Network, Consultations & Partner Application Tests', () => {
   let mockApi;
   let mockUser;
@@ -324,7 +325,7 @@ describe('Doctor Network, Consultations & Partner Application Tests', () => {
       fireEvent.change(screen.getByPlaceholderText(/Speciality or services offered/i), {
         target: { value: 'Biochemistry, Haematology' },
       });
-      fireEvent.change(screen.getByPlaceholderText(/Area in Dehradun/i), {
+      fireEvent.change(screen.getByPlaceholderText(new RegExp(`Area in ${CITY}`, 'i')), {
         target: { value: 'Rajpur Road' },
       });
       fireEvent.change(screen.getByPlaceholderText(/Mobile number/i), {

@@ -5,6 +5,7 @@ import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { CITY } from '../src/lib/locale.js';
 const navigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -53,8 +54,11 @@ const PACKAGE = {
   basePrice: 1499,
   strikePrice: 1999,
   turnaroundHrs: 8,
-  parametersCount: 54,
-  description: 'A 54-parameter baseline covering blood count, sugar, lipids and thyroid.',
+  // The count the card shows is the length of this list, not a separate
+  // number. A package that claims 54 parameters and can name none is a claim
+  // the page cannot substantiate, so the UI counts what it can actually show.
+  parameters: ['Haemoglobin', 'Fasting Glucose', 'Total Cholesterol', 'TSH'],
+  description: 'A baseline covering blood count, sugar, lipids and thyroid.',
   category: 'package',
 };
 
@@ -69,7 +73,7 @@ describe('HomePage', () => {
   it('renders the hero with the value proposition', async () => {
     renderHome();
     expect(await screen.findByText(/Lab tests at home/i)).toBeInTheDocument();
-    expect(screen.getByText(/Now live in Dehradun/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Now live in ${CITY}`, 'i'))).toBeInTheDocument();
   });
 
   it('makes only claims that are true before the first customer', async () => {
@@ -95,7 +99,7 @@ describe('HomePage', () => {
     expect(card).toHaveTextContent('₹1,499');       // Indian digit grouping
     expect(card).toHaveTextContent('₹1,999');       // struck through
     expect(card).toHaveTextContent('25% OFF');      // derived, not hardcoded
-    expect(card).toHaveTextContent('54 parameters');
+    expect(card).toHaveTextContent('4 parameters');
     expect(card).toHaveTextContent('Reports in 8 hrs');
   });
 

@@ -5,6 +5,7 @@ import Chip from '../components/atoms/Chip.jsx';
 import EmptyState from '../components/atoms/EmptyState.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
+import { CITY } from '../lib/locale.js';
 export function DoctorDashboardPage() {
   const { user, api } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
@@ -107,7 +108,7 @@ export function DoctorDashboardPage() {
         >
           <p className="text-bodySmall text-blue700 leading-relaxed font-medium">
             <span className="font-bold">PathCare takes no share of your consultation fee, and pays no referral commission.</span>{' '}
-            Patients pay you directly at your clinic. The platform subscription is free while we build the Dehradun network.
+            Patients pay you directly at your clinic. The platform subscription is free while we build the {CITY} network.
           </p>
         </div>
 

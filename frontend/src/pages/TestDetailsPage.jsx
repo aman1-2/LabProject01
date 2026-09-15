@@ -12,6 +12,7 @@ import { useTestBySlug, useNearbyLabs } from '@pathcare/api';
 import { useCart } from '../context/CartContext.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 
+import { SAMPLE_ADDRESS } from '../lib/locale.js';
 export default function TestDetailsPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -147,7 +148,12 @@ export default function TestDetailsPage() {
               {test.parameters && test.parameters.length > 0 && (
                 <div className="mb-6 p-4 rounded-lg bg-white border border-border">
                   <p className="font-extrabold text-xs text-muted uppercase tracking-wider mb-2.5">
-                    {test.parametersCount || test.parameters.length} Key Parameters Measured
+                    {/* The list is the evidence for the number. Announcing
+                        "92 Key Parameters" above a list of 10 is a claim the
+                        page cannot substantiate, and on a diagnostics site a
+                        patient books expecting a marker that may not be in the
+                        panel. Count what is actually shown. */}
+                    {test.parameters.length} Key Parameters Measured
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {test.parameters.map((param, i) => (
@@ -218,7 +224,7 @@ export default function TestDetailsPage() {
 
                 {/* User Location Label Card */}
                 <div className="absolute bottom-2.5 left-3 bg-white px-3 py-1.5 rounded-pill text-xs font-bold text-ink shadow-xs border border-border">
-                  You · Rajpur Road, Dehradun
+                  You · {SAMPLE_ADDRESS}
                 </div>
               </div>
 

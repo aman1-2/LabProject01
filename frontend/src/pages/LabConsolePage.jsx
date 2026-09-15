@@ -6,6 +6,7 @@ import { Button, Card, Chip, EmptyState, Modal, Input } from '../components/atom
 import RichTextEditor from '../components/RichTextEditor';
 import Icon from '../components/atoms/Icon.jsx';
 
+import { CITY } from '../lib/locale.js';
 export function LabConsolePage({ initialTab = 'queue' }) {
   const { user, api, logout } = useAuth();
   const navigate = useNavigate();
@@ -698,7 +699,7 @@ export function LabConsolePage({ initialTab = 'queue' }) {
 
                 <div className="flex justify-between items-center py-2 border-b border-border/70">
                   <span className="text-sm font-semibold text-muted">Area</span>
-                  <span className="text-sm font-medium text-ink">{centreProfile?.area || 'Dehradun'}</span>
+                  <span className="text-sm font-medium text-ink">{centreProfile?.area || CITY}</span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-border/70">

@@ -6,6 +6,7 @@ import { Button, Card, Chip, EmptyState, Modal } from '../components/atoms';
 import AdminCreateModal from '../components/organisms/AdminCreateModal.jsx';
 import IssuedCredentials from '../components/organisms/IssuedCredentials.jsx';
 
+import { CITY, SAMPLE_AREA } from '../lib/locale.js';
 export function AdminConsolePage({ initialTab = 'overview' }) {
   const { user, api, logout } = useAuth();
   const navigate = useNavigate();
@@ -446,7 +447,7 @@ export function AdminConsolePage({ initialTab = 'overview' }) {
           <div>
             <h1 className="text-2xl font-extrabold text-ink">Business Overview</h1>
             <p className="text-sm text-muted mt-1 mb-6">
-              Live figures from actual platform activity. Dehradun.
+              Live figures from actual platform activity. {CITY}.
             </p>
 
             {loadingOverview ? (
@@ -984,7 +985,7 @@ export function AdminConsolePage({ initialTab = 'overview' }) {
         fields={[
           { name: 'name', label: 'Centre name', required: true, placeholder: 'Sunrise Diagnostics' },
           { name: 'area', label: 'Area', required: true, placeholder: 'Rajpur Road' },
-          { name: 'address', label: 'Full address', required: true, placeholder: '12 Rajpur Road, Dehradun' },
+          { name: 'address', label: 'Full address', required: true, placeholder: `12 ${SAMPLE_AREA}, ${CITY}` },
           { name: 'lat', label: 'Latitude', type: 'number', required: true, placeholder: '30.3165' },
           {
             name: 'lng',

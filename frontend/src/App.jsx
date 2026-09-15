@@ -24,6 +24,7 @@ import Chip from './components/atoms/Chip.jsx';
 import Button from './components/atoms/Button.jsx';
 import EmptyState from './components/atoms/EmptyState.jsx';
 
+import { CITY, SAMPLE_ADDRESS } from './lib/locale.js';
 function Dashboard() {
   const { user, api, logout } = useAuth();
   const navigate = useNavigate();
@@ -91,7 +92,7 @@ function Dashboard() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">City:</span>
-                <span className="font-bold text-ink">Dehradun</span>
+                <span className="font-bold text-ink">{CITY}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Role:</span>
@@ -100,7 +101,7 @@ function Dashboard() {
               <div className="flex justify-between">
                 <span className="text-muted">Address:</span>
                 <span className="font-bold text-ink truncate max-w-[180px]">
-                  {user?.location?.address || 'Rajpur Road, Dehradun'}
+                  {user?.location?.address || SAMPLE_ADDRESS}
                 </span>
               </div>
             </div>

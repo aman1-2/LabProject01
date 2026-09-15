@@ -10,6 +10,7 @@ import Icon from '../components/atoms/Icon.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar.jsx';
 import SubscriptionsPanel from '../components/organisms/SubscriptionsPanel.jsx';
 
+import { SAMPLE_ADDRESS } from '../lib/locale.js';
 export default function ProfilePage() {
   const { user, api, logout, updateUser } = useAuth();
   const navigate = useNavigate();
@@ -624,7 +625,7 @@ export default function ProfilePage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setProfileLocation('Rajpur Road, Dehradun');
+                            setProfileLocation(SAMPLE_ADDRESS);
                             showToast('Location detected.');
                           }}
                           className="px-3 border border-border rounded-xl hover:bg-neutral-50 transition text-sm cursor-pointer"

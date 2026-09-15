@@ -6,6 +6,7 @@ import Button from '../components/atoms/Button.jsx';
 import Input from '../components/atoms/Input.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
+import { CITY } from '../lib/locale.js';
 export function PartnerApplyPage() {
   const navigate = useNavigate();
   const { api } = useAuth();
@@ -99,7 +100,7 @@ export function PartnerApplyPage() {
               Partner with PathCare
             </h1>
             <p className="text-body text-muted leading-relaxed mb-6">
-              We are onboarding doctors and diagnostic labs across Dehradun. Tell us about your practice and we will get in touch within two working days.
+              We are onboarding doctors and diagnostic labs across {CITY}. Tell us about your practice and we will get in touch within two working days.
             </p>
 
             <Card className="p-6 sm:p-8 mb-6" data-testid="partner-form-card">
@@ -188,11 +189,11 @@ export function PartnerApplyPage() {
                 />
 
                 <Input
-                  label="Area in Dehradun"
+                  label={`Area in ${CITY}`}
                   name="area"
                   value={formData.area}
                   onChange={handleChange}
-                  placeholder="Area in Dehradun"
+                  placeholder={`Area in ${CITY}`}
                   required
                 />
 

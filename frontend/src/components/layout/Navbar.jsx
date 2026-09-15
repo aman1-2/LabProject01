@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Button from '../atoms/Button.jsx';
 import Icon from '../atoms/Icon.jsx';
@@ -8,6 +8,25 @@ import NavDrawer from './NavDrawer.jsx';
 import CartDrawer from '../organisms/CartDrawer.jsx';
 import { useCart } from '../../context/CartContext.jsx';
 import { toolsForRole } from '../../lib/roleNav.js';
+
+/**
+ * Class list for a top-level nav link, given whether it is the current page.
+ *
+ * Active is signalled twice over — the label darkens to full ink AND gains an
+ * underline bar. Colour alone fails anyone who cannot distinguish the two
+ * greys, which on a medical site is not a hypothetical audience.
+ *
+ * The bar is a pseudo-element rather than a border so it does not shift the
+ * text by a pixel when it appears.
+ */
+function navLinkClass({ isActive }) {
+  const base =
+    'relative text-body font-semibold transition after:absolute after:-bottom-1.5 ' +
+    'after:left-0 after:right-0 after:h-[2.5px] after:rounded-pill after:transition-all';
+  return isActive
+    ? `${base} text-ink after:bg-blue600 after:opacity-100`
+    : `${base} text-muted hover:text-ink after:bg-transparent after:opacity-0`;
+}
 
 /**
  * Sticky Navbar conforming to DESIGN_SPEC §3.1 and prototype lines 50-68:
@@ -45,21 +64,21 @@ export function Navbar() {
 
           {/* Centred Nav Links (Desktop) */}
           <div className="hidden md:flex items-center gap-7">
-            <Link to="/" className="text-body font-semibold text-muted hover:text-ink transition">
+            <NavLink to="/" end className={navLinkClass}>
               Home
-            </Link>
-            <Link to="/tests" className="text-body font-semibold text-muted hover:text-ink transition" data-testid="nav-tests-link">
+            </NavLink>
+            <NavLink to="/tests" className={navLinkClass} data-testid="nav-tests-link">
               Tests &amp; Packages
-            </Link>
-            <Link to="/doctors" className="text-body font-semibold text-blue600 hover:text-blue700 transition" data-testid="nav-doctors-link">
+            </NavLink>
+            <NavLink to="/doctors" className={navLinkClass} data-testid="nav-doctors-link">
               Find Doctors
-            </Link>
-            <Link to="/track" className="text-body font-semibold text-muted hover:text-ink transition" data-testid="nav-track-link">
+            </NavLink>
+            <NavLink to="/track" className={navLinkClass} data-testid="nav-track-link">
               Track Order
-            </Link>
-            <Link to="/partner" className="text-body font-semibold text-muted hover:text-ink transition" data-testid="nav-partner-link">
+            </NavLink>
+            <NavLink to="/partner" className={navLinkClass} data-testid="nav-partner-link">
               Partner
-            </Link>
+            </NavLink>
 
             {/* "For Doctors" used to sit here for everyone, pointing at the
                 doctor dashboard. To a patient that is a link to a page they
@@ -67,15 +86,24 @@ export function Navbar() {
                 them, and are marked as staff tools so they do not read as
                 another patient feature. */}
             {roleTools.map((tool) => (
-              <Link
+              <NavLink
                 key={tool.key}
                 to={tool.to}
                 data-testid={`nav-role-${tool.key}`}
-                className="flex items-center gap-1.5 rounded-pill bg-blue50 px-3.5 py-1.5 text-bodySmall font-bold text-blue700 transition hover:bg-blue100"
+                /* Already a blue pill when idle, so an underline would not
+                   read. Active inverts it instead — the same signal strength
+                   the plain links get from their bar. */
+                className={({ isActive }) =>
+                  `flex items-center gap-1.5 rounded-pill px-3.5 py-1.5 text-bodySmall font-bold transition ${
+                    isActive
+                      ? 'bg-blue600 text-white shadow-xs'
+                      : 'bg-blue50 text-blue700 hover:bg-blue100'
+                  }`
+                }
               >
                 <Icon name={tool.icon} size={14} strokeWidth={2.2} />
                 {tool.label}
-              </Link>
+              </NavLink>
             ))}
           </div>
 

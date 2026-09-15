@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '../src/context/AuthContext.jsx';
 import App from '../src/App.jsx';
 
+import { CITY } from '../src/lib/locale.js';
 describe('App Component Navigation', () => {
   it('renders auth page when visiting /auth', () => {
     render(
@@ -13,6 +14,6 @@ describe('App Component Navigation', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Now live in Dehradun/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Now live in ${CITY}`, 'i'))).toBeInTheDocument();
   });
 });

@@ -6,6 +6,7 @@ import Navbar from '../components/layout/Navbar.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 import Skeleton from '../components/atoms/Skeleton.jsx';
 
+import { CITY, CITY_STATE } from '../lib/locale.js';
 /**
  * The landing page.
  *
@@ -56,7 +57,7 @@ const FAQS = [
   },
   {
     q: 'Which labs process my sample?',
-    a: 'Only NABL- or ISO-accredited partner labs in Dehradun. You choose which one before you book, and you can see each lab’s price and turnaround up front.',
+    a: `Only NABL- or ISO-accredited partner labs in ${CITY}. You choose which one before you book, and you can see each lab’s price and turnaround up front.`,
   },
   {
     q: 'Do I need to fast?',
@@ -124,7 +125,7 @@ export default function HomePage() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-pill bg-white/10 px-3.5 py-1.5 text-caption font-bold uppercase tracking-[0.06em] text-white/90 backdrop-blur">
                 <Icon name="mapPin" size={13} strokeWidth={2.4} />
-                Now live in Dehradun
+                Now live in {CITY}
               </span>
 
               <h1 className="mt-6 text-[38px] font-extrabold leading-[1.06] tracking-[-0.02em] text-white md:text-[52px]">
@@ -325,10 +326,10 @@ export default function HomePage() {
                   </span>
 
                   <span className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-caption text-muted">
-                    {pkg.parametersCount > 0 && (
+                    {pkg.parameters?.length > 0 && (
                       <span className="inline-flex items-center gap-1.5">
                         <Icon name="clipboard" size={13} strokeWidth={2.2} />
-                        {pkg.parametersCount} parameters
+                        {pkg.parameters.length} parameters
                       </span>
                     )}
                     <span className="inline-flex items-center gap-1.5">
@@ -616,7 +617,7 @@ export default function HomePage() {
               alt: 'A gloved lab worker loading a blood sample tube into a centrifuge',
               eyebrow: 'For patients',
               title: 'Book a test in under a minute',
-              body: 'Free home collection across Dehradun. Choose your lab, choose your slot.',
+              body: `Free home collection across ${CITY}. Choose your lab, choose your slot.`,
               cta: 'Browse tests',
               testid: 'home-cta-browse',
               to: '/tests',
@@ -689,7 +690,7 @@ export default function HomePage() {
                 Path<span className="font-extrabold text-white/70">Care</span>
               </span>
               <p className="mt-3 max-w-[240px] text-caption leading-relaxed text-white/50">
-                On-demand pathology and diagnostics. Dehradun, Uttarakhand.
+                On-demand pathology and diagnostics. {CITY_STATE}.
               </p>
             </div>
 

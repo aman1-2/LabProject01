@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Button from '../atoms/Button.jsx';
 import Icon from '../atoms/Icon.jsx';
@@ -8,6 +8,22 @@ import { toolsForRole } from '../../lib/roleNav.js';
 /**
  * Mobile Slide-out Drawer below 768px per DESIGN_SPEC §5 and prototype lines 185-191.
  */
+/**
+ * Class list for a drawer row.
+ *
+ * The desktop bar marks the current page with an underline; a full-width row
+ * wants a left edge and a tinted background instead — the same signal in the
+ * shape this layout allows. The transparent border on the inactive state keeps
+ * the text from shifting 3px when a row becomes active.
+ */
+function drawerLinkClass({ isActive }) {
+  const base =
+    'py-3.5 pl-3 pr-1.5 font-bold text-body border-b border-border transition border-l-[3px]';
+  return isActive
+    ? `${base} text-blue700 border-l-blue600 bg-blue50`
+    : `${base} text-ink border-l-transparent hover:text-blue600`;
+}
+
 export function NavDrawer({ isOpen, onClose }) {
   const { isAuthenticated, user, logout } = useAuth();
   const roleTools = toolsForRole(user?.role);
@@ -35,61 +51,67 @@ export function NavDrawer({ isOpen, onClose }) {
         </button>
 
         <div className="flex flex-col gap-1 my-4">
-          <Link
-            to="/"
+          <NavLink
+            to="/" end
             onClick={onClose}
-            className="py-3.5 px-1.5 font-bold text-body text-ink border-b border-border hover:text-blue600 transition"
+            className={drawerLinkClass}
           >
             Home
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/tests"
             onClick={onClose}
-            className="py-3.5 px-1.5 font-bold text-body text-ink border-b border-border hover:text-blue600 transition"
+            className={drawerLinkClass}
             data-testid="drawer-tests-link"
           >
             Tests &amp; Packages
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/doctors"
             onClick={onClose}
-            className="py-3.5 px-1.5 font-bold text-body text-ink border-b border-border hover:text-blue600 transition"
+            className={drawerLinkClass}
             data-testid="drawer-doctors-link"
           >
             Find Doctors
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/track"
             onClick={onClose}
-            className="py-3.5 px-1.5 font-bold text-body text-ink border-b border-border hover:text-blue600 transition"
+            className={drawerLinkClass}
             data-testid="drawer-track-link"
           >
             Track Order
-          </Link>
+          </NavLink>
           {/* Staff tools, for the role that owns them. This matters more here
               than on desktop: below 768px the main nav is gone entirely, so
               without these a lab admin on a phone has no way in. */}
           {roleTools.map((tool) => (
-            <Link
+            <NavLink
               key={tool.key}
               to={tool.to}
               onClick={onClose}
               data-testid={`drawer-role-${tool.key}`}
-              className="flex items-center gap-2 border-b border-border px-1.5 py-3.5 text-body font-bold text-blue700 transition hover:text-blue600"
+              className={({ isActive }) =>
+                `flex items-center gap-2 border-b border-border border-l-[3px] py-3.5 pl-3 pr-1.5 text-body font-bold transition ${
+                  isActive
+                    ? 'border-l-blue600 bg-blue50 text-blue700'
+                    : 'border-l-transparent text-blue700 hover:text-blue600'
+                }`
+              }
             >
               <Icon name={tool.icon} size={16} strokeWidth={2.2} />
               {tool.label}
-            </Link>
+            </NavLink>
           ))}
 
-          <Link
+          <NavLink
             to="/partner"
             onClick={onClose}
-            className="py-3.5 px-1.5 font-bold text-body text-ink border-b border-border hover:text-blue600 transition"
+            className={drawerLinkClass}
             data-testid="drawer-partner-link"
           >
             Partner with Us
-          </Link>
+          </NavLink>
         </div>
 
         <div className="mt-auto pt-4 border-t border-border">

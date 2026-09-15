@@ -7,6 +7,7 @@ import OtpModal from '../components/auth/OtpModal.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 import { passwordSchema } from '@pathcare/validators';
 
+import { CITY } from '../lib/locale.js';
 /**
  * The strength meter, derived from the SAME schema the server validates with.
  *
@@ -386,7 +387,7 @@ export default function AuthPage() {
             <div className="max-w-md">
               <span className="inline-flex items-center gap-2 rounded-pill bg-white/10 px-3.5 py-1.5 text-caption font-bold uppercase tracking-[0.06em] text-white/90 backdrop-blur">
                 <Icon name="mapPin" size={13} strokeWidth={2.4} />
-                Now live in Dehradun
+                Now live in {CITY}
               </span>
 
               <h2 className="mt-6 text-[34px] font-extrabold leading-[1.14] tracking-[-0.02em] text-white">
@@ -657,7 +658,7 @@ export default function AuthPage() {
                 Create Account
               </h2>
               <p className="text-muted text-bodySmall mb-4">
-                Join PathCare Dehradun for doorstep pathology &amp; live tracking.
+                Join PathCare {CITY} for doorstep pathology &amp; live tracking.
               </p>
 
               {/* Account Type Selector per prototype .acct-type-card */}
@@ -815,7 +816,7 @@ export default function AuthPage() {
               {/* Location with Detect Button */}
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block text-caption font-bold text-ink">Service Address (Dehradun)</label>
+                  <label className="block text-caption font-bold text-ink">Service Address ({CITY})</label>
                   <button
                     type="button"
                     onClick={handleDetectLocation}

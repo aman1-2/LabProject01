@@ -234,7 +234,7 @@ export default function CataloguePage() {
                               {test.name}
                             </h3>
                             <p className="text-muted text-caption leading-relaxed line-clamp-2">
-                              {test.parametersCount ? `${test.parametersCount} parameters · ` : ''}
+                              {test.parameters?.length ? `${test.parameters.length} parameters · ` : ''}
                               Reports in {test.turnaroundHrs} hrs
                               {test.frequency ? ` · ${test.frequency}` : ''}
                             </p>
