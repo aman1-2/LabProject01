@@ -13,7 +13,7 @@ import { fetchTestBySlug, fetchNearbyLabs, fetchDoctors, fetchCartQuote } from '
 import { useCart } from '../context/CartContext.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 
-import { CITY } from '../lib/locale.js';
+import { CITY, DEFAULT_LAT, DEFAULT_LNG } from '../lib/locale.js';
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -133,8 +133,8 @@ export default function BookingPage() {
         // what the server applies to the whole basket, so the total below is
         // computed from it the same way calculateBookingPrice does.
         const labsData = await fetchNearbyLabs({
-          lat: 30.3165,
-          lng: 78.0322,
+          lat: DEFAULT_LAT,
+          lng: DEFAULT_LNG,
           testId: testData.slug,
         });
 

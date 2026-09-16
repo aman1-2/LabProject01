@@ -7,7 +7,7 @@ import { colors, type, card, chip, layout } from '../theme.js';
 import { Banner, Chip, ErrorState, LoadingState, PrimaryButton, ScreenHeader } from '../components/ui.jsx';
 import Icon from '../components/Icon.jsx';
 import { formatCurrency, homeCollectionNote } from '../lib/format.js';
-import { DEHRADUN } from '../config/city.js';
+import { CITY_CENTRE as DEHRADUN } from '../config/locale.js';
 
 /**
  * Test details, transcribed from the prototype's #screen-testdetails: gradient

@@ -195,8 +195,23 @@ export const createAddressSchema = z.object({
   label: z.enum(['Home', 'Work', 'Other']).default('Home'),
   line: z.string({ required_error: 'Address line is required' }).trim().min(3, 'Address line must be at least 3 characters').max(300),
   pincode: z.string({ required_error: 'Pincode is required' }).regex(/^\d{6}$/, 'Please enter a valid 6-digit Indian pincode'),
-  lat: z.coerce.number().optional().default(30.3165),
-  lng: z.coerce.number().optional().default(78.0322),
+  /**
+   * Required, with no default.
+   *
+   * These used to default to a city centre. An address created without
+   * coordinates was therefore accepted and silently placed ~200km away once
+   * the service moved city — a phlebotomist dispatched to the wrong town, with
+   * the address TEXT reading correctly the whole time. An address nobody can
+   * navigate to is not a valid address, so it is rejected rather than guessed.
+   */
+  lat: z.coerce
+    .number({ required_error: 'Latitude is required' })
+    .min(-90, 'Latitude must be between -90 and 90')
+    .max(90, 'Latitude must be between -90 and 90'),
+  lng: z.coerce
+    .number({ required_error: 'Longitude is required' })
+    .min(-180, 'Longitude must be between -180 and 180')
+    .max(180, 'Longitude must be between -180 and 180'),
   isDefault: z.boolean().optional().default(false),
 });
 

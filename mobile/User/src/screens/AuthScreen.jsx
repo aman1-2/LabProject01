@@ -8,6 +8,7 @@ import { Banner, FieldLabel, GhostButton, PrimaryButton, ScreenHeader } from '..
 import Icon from '../components/Icon.jsx';
 import { elevation } from '../components/motion.jsx';
 
+import { DEFAULT_LAT, DEFAULT_LNG, CITY } from '../config/locale.js';
 /**
  * Sign in / create account, transcribed from the prototype's #screen-login and
  * #screen-signup.
@@ -114,8 +115,8 @@ export default function AuthScreen({ initialMode = 'login', onBack }) {
         // permission; the typed address is the part a phlebotomist actually
         // navigates by, so it must be the patient's own.
         location: {
-          lat: 30.3165,
-          lng: 78.0322,
+          lat: DEFAULT_LAT,
+          lng: DEFAULT_LNG,
           address: address.trim(),
           source: 'manual',
         },
@@ -412,7 +413,7 @@ export default function AuthScreen({ initialMode = 'login', onBack }) {
               </View>
             ) : null}
 
-            <FieldLabel>Service Address (Dehradun)</FieldLabel>
+            <FieldLabel>Service Address ({CITY})</FieldLabel>
             {/* The website has always collected this; the app did not, and fell
                 back to a default Dehradun location. That meant a patient who
                 signed up on their phone had an address on file that was not

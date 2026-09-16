@@ -11,6 +11,7 @@ import {
 import { configurePatientApi } from '../api/configure.js';
 import { saveTokens, clearTokens, getRefreshToken } from './secureTokens.js';
 
+import { DEFAULT_LAT, DEFAULT_LNG, CITY_STATE } from '../config/locale.js';
 const AuthContext = createContext(null);
 
 /** 'restoring' until the stored session has been checked — never assume signed out. */
@@ -20,9 +21,9 @@ const AuthContext = createContext(null);
  * saved addresses once they add one.
  */
 const DEFAULT_LOCATION = {
-  lat: 30.3165,
-  lng: 78.0322,
-  address: 'Dehradun, Uttarakhand',
+  lat: DEFAULT_LAT,
+  lng: DEFAULT_LNG,
+  address: CITY_STATE,
   source: 'default',
 };
 

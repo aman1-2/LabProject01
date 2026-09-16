@@ -174,7 +174,11 @@ export default [
     // as an unused variable.
     files: ['mobile/**/*.{js,jsx}'],
     plugins: { react, 'react-hooks': reactHooks },
-    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+    // __DEV__ is injected by the React Native runtime, not by Node or a
+    // browser, so neither globals set declares it.
+    languageOptions: {
+      globals: { ...globals.node, ...globals.browser, __DEV__: 'readonly' },
+    },
     settings: { react: { version: 'detect' } },
     rules: {
       'no-console': 'warn',

@@ -7,7 +7,7 @@ import OtpModal from '../components/auth/OtpModal.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 import { passwordSchema } from '@pathcare/validators';
 
-import { CITY } from '../lib/locale.js';
+import { CITY, DEFAULT_LAT, DEFAULT_LNG } from '../lib/locale.js';
 /**
  * The strength meter, derived from the SAME schema the server validates with.
  *
@@ -89,7 +89,7 @@ export default function AuthPage() {
   // per-field decision, and it should not persist across tabs.
   const [showSignInPassword, setShowSignInPassword] = useState(false);
   const [address, setAddress] = useState('');
-  const [locationCoords, setLocationCoords] = useState({ lat: 30.3165, lng: 78.0322 });
+  const [locationCoords, setLocationCoords] = useState({ lat: DEFAULT_LAT, lng: DEFAULT_LNG });
   const [locationSource, setLocationSource] = useState('manual');
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
 

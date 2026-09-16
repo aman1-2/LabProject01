@@ -19,7 +19,7 @@ import {
   ScreenHeader,
 } from '../components/ui.jsx';
 import { formatCurrency } from '../lib/format.js';
-import { DEHRADUN } from '../config/city.js';
+import { CITY_CENTRE as DEHRADUN } from '../config/locale.js';
 
 /**
  * Booking, following DESIGN_SPEC §3.6's five numbered sections adapted to one

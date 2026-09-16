@@ -10,6 +10,7 @@ import { DangerButton } from '../components/ui.jsx';
 import { Pressable3D, elevation } from '../components/motion.jsx';
 import Icon from '../components/Icon.jsx';
 
+import { CITY } from '../config/locale.js';
 /**
  * Profile.
  *
@@ -163,7 +164,7 @@ export default function ProfileScreen({ navigation }) {
         </View>
 
         <Text style={styles.footnote}>
-          PathCare · Dehradun{'\n'}
+          PathCare · {CITY}{'\n'}
           Partner labs are NABL or ISO accredited.
         </Text>
       </ScrollView>

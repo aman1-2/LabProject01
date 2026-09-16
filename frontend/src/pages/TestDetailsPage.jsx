@@ -12,11 +12,11 @@ import { useTestBySlug, useNearbyLabs } from '@pathcare/api';
 import { useCart } from '../context/CartContext.jsx';
 import Icon from '../components/atoms/Icon.jsx';
 
-import { SAMPLE_ADDRESS } from '../lib/locale.js';
+import { SAMPLE_ADDRESS, DEFAULT_LAT, DEFAULT_LNG } from '../lib/locale.js';
 export default function TestDetailsPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { add, has, openCart, lastRejection } = useCart();
 
   // Server state comes from TanStack Query hooks in common/api (CONTEXT §7.1).
@@ -35,7 +35,7 @@ export default function TestDetailsPage() {
     isError: isLabsError,
     error: labsQueryError,
     refetch: refetchLabs,
-  } = useNearbyLabs({ lat: 30.3165, lng: 78.0322, testId: test?.slug });
+  } = useNearbyLabs({ lat: user?.location?.lat ?? DEFAULT_LAT, lng: user?.location?.lng ?? DEFAULT_LNG, testId: test?.slug });
 
   const labs = labsData?.labs ?? [];
 

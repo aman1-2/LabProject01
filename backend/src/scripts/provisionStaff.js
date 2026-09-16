@@ -11,15 +11,15 @@
  * nothing (CONTEXT §11), and refuses to run against production.
  *
  *   node src/scripts/provisionStaff.js --role super_admin \
- *     --handle admin.aman --phone 9800000001 --name "Aman Pratap Singh" \
+ *     --handle admin_aman --phone 9800000001 --name "Aman Pratap Singh" \
  *     --password 'SomethingStrong1'
  *
  *   node src/scripts/provisionStaff.js --role lab_admin \
- *     --handle lab.sunrise --phone 9800000002 --name "Sunrise Lab Desk" \
+ *     --handle lab_sunrise --phone 9800000002 --name "Sunrise Lab Desk" \
  *     --password 'SomethingStrong1' --lab "Sunrise Diagnostics"
  *
  *   node src/scripts/provisionStaff.js --role doctor \
- *     --handle dr.sharma --phone 9800000003 --name "Dr S Sharma" \
+ *     --handle dr_sharma --phone 9800000003 --name "Dr S Sharma" \
  *     --password 'SomethingStrong1' \
  *     --specialization "Internal Medicine" --clinic "Doon Clinic" \
  *     --fee 500 --walkInFee 700

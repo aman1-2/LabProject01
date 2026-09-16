@@ -9,6 +9,7 @@ import Icon from '../components/Icon.jsx';
 import { useCart } from '../catalogue/CartContext.jsx';
 import { formatCurrency } from '../lib/format.js';
 
+import { CITY } from '../config/locale.js';
 /**
  * Tests & Packages, transcribed from the prototype's #screen-testcatalog:
  * horizontal-scrolling filter chips (never wrapping, per §5) over full-width cards.
@@ -133,7 +134,7 @@ export default function CatalogueScreen({ navigation, route }) {
             title={search ? 'No tests match that search' : 'No tests in this section'}
             message={
               search
-                ? 'Try a different word, or clear the search to see everything available in Dehradun.'
+                ? `Try a different word, or clear the search to see everything available in ${CITY}.`
                 : 'Tests in this section will appear here as they are added to the catalogue.'
             }
           />
@@ -216,7 +217,11 @@ function TestCard({ item, onPress, onAdd, inCart }) {
 
       <Text style={styles.cardTitle}>{item.name}</Text>
       <Text style={styles.cardMeta}>
-        {item.parametersCount ? `${item.parametersCount} parameters · ` : ''}
+        {/* The list is the evidence for the number. A package claiming 92
+            parameters while naming none is a claim the app cannot back up,
+            and on a diagnostics app a patient books expecting a marker that
+            may not be in the panel. Count what can actually be shown. */}
+        {item.parameters?.length ? `${item.parameters.length} parameters · ` : ''}
         Reports in {item.turnaroundHrs} hrs
       </Text>
 

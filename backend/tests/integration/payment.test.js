@@ -341,7 +341,12 @@ describe('Payment & Webhook Integration Tests', () => {
         .send(rawBody);
       expect(res1.status).toBe(200);
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Wait for delivery 1 to be APPLIED before sending the duplicate —
+      // otherwise the two race and the test proves nothing about idempotency.
+      await waitFor(async () => {
+        const p = await Payment.findOne({ gatewayOrderId: orderId });
+        return p?.webhookEventIds?.includes('evt_duplicate_002') ? p : null;
+      });
 
       // Delivery 2 (duplicate delivery from Razorpay)
       const res2 = await request(app)
@@ -351,7 +356,13 @@ describe('Payment & Webhook Integration Tests', () => {
         .send(rawBody);
       expect(res2.status).toBe(200);
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // The duplicate must leave exactly one record and one event id. Poll
+      // until the second delivery has been processed, so a slow machine does
+      // not pass this by simply not having applied it yet.
+      await waitFor(async () => {
+        const p = await Payment.findOne({ gatewayOrderId: orderId });
+        return p && (await Payment.countDocuments({ gatewayOrderId: orderId })) === 1 ? p : null;
+      });
 
       // Assert exactly one payment record exists and event appears once in webhookEventIds
       const totalPayments = await Payment.countDocuments({ gatewayOrderId: orderId });
@@ -407,9 +418,15 @@ describe('Payment & Webhook Integration Tests', () => {
         .send(rawBody);
 
       expect(res.status).toBe(200);
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // `waitFor`, not a fixed sleep. 100ms was enough when this file ran
+      // alone and not enough inside the full suite, so the test reported a
+      // paid booking as unpaid depending only on machine load.
+      const updatedBooking = await waitFor(async () => {
+        const b = await Booking.findById(booking._id);
+        return b.paymentStatus === 'paid' ? b : null;
+      });
 
-      const updatedBooking = await Booking.findById(booking._id);
+      expect(updatedBooking).not.toBeNull();
       expect(updatedBooking.paymentStatus).toBe('paid');
     });
   });

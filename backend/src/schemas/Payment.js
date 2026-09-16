@@ -15,9 +15,11 @@ const paymentSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    // `sparse` is an index option, so setting it here declares an index that
+    // the block below declares again. Declared once, there, with the same
+    // sparse+unique semantics.
     gatewayOrderId: {
       type: String,
-      sparse: true,
     },
     gatewayPaymentId: {
       type: String,

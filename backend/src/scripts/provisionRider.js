@@ -11,7 +11,7 @@
  * and it refuses to run against production, exactly as seedCatalogue does.
  *
  *   node src/scripts/provisionRider.js \
- *     --handle rider.arjun --phone 9876543210 --name "Arjun Mehta" \
+ *     --handle rider_arjun --phone 9876543210 --name "Arjun Mehta" \
  *     --password 'SomethingStrong1!' --lab "Sunrise Diagnostics"
  *
  * Re-running with the same handle updates that rider rather than erroring, so
@@ -134,8 +134,8 @@ if (process.argv[1] && process.argv[1].endsWith('provisionRider.js')) {
       process.stderr.write(
         `Missing required argument(s): ${missing.map((m) => `--${m}`).join(', ')}\n\n` +
           `Usage:\n  node src/scripts/provisionRider.js \\\n` +
-          `    --handle rider.name --phone 9876543210 --name "Full Name" \\\n` +
-          `    --password 'StrongPassword1!' [--lab "Lab Centre Name"] [--lat 30.3165 --lng 78.0322]\n\n` +
+          `    --handle rider_name --phone 9876543210 --name "Full Name" \\\n` +
+          `    --password 'StrongPassword1!' [--lab "Lab Centre Name"] [--lat <latitude> --lng <longitude>]\n\n` +
           `Nothing is invented: every value comes from you.\n`
       );
       process.exit(1);

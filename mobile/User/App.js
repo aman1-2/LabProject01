@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createQueryClient } from '@pathcare/api';
@@ -48,9 +48,17 @@ export default function App() {
         <AuthProvider>
           <CartProvider>
           <StatusBar style="dark" />
-          {/* Until the cache is read, AuthProvider is still restoring the
-              session anyway, so the splash covers both. */}
-          <RootNavigator cacheReady={cacheReady} />
+          {/* Android draws this app edge-to-edge, so without a top inset every
+              screen's header sits underneath the clock and battery icons —
+              "Hi, Aman!" and "Tests & Packages" were both overlapping them.
+              Applied once here rather than in each screen's own header, so a
+              screen added later inherits it instead of repeating the bug.
+              `edges` is top-only: the tab bar handles the bottom itself. */}
+          <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+            {/* Until the cache is read, AuthProvider is still restoring the
+                session anyway, so the splash covers both. */}
+            <RootNavigator cacheReady={cacheReady} />
+          </SafeAreaView>
           </CartProvider>
         </AuthProvider>
       </QueryClientProvider>

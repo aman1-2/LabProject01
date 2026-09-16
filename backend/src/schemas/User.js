@@ -27,20 +27,21 @@ const locationSchema = new mongoose.Schema(
 
 const userSchema = new mongoose.Schema(
   {
+    // `unique` and `index` are deliberately NOT set here. Both are index
+    // declarations, and the index block below already declares this one — three
+    // declarations of the same index is what produced Mongoose's "Duplicate
+    // schema index" warning on every process start. Uniqueness is enforced by
+    // that index, so nothing is lost by declaring it in one place.
     accountHandle: {
       type: String,
       required: [true, 'Account handle is required'],
-      unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     phone: {
       type: String,
       required: [true, 'Phone number is required'],
-      unique: true,
       trim: true,
-      index: true,
     },
     name: {
       type: String,

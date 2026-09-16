@@ -6,7 +6,7 @@ import { Button, Card, Chip, EmptyState, Modal } from '../components/atoms';
 import AdminCreateModal from '../components/organisms/AdminCreateModal.jsx';
 import IssuedCredentials from '../components/organisms/IssuedCredentials.jsx';
 
-import { CITY, SAMPLE_AREA } from '../lib/locale.js';
+import { CITY, SAMPLE_AREA, DEFAULT_LAT, DEFAULT_LNG } from '../lib/locale.js';
 export function AdminConsolePage({ initialTab = 'overview' }) {
   const { user, api, logout } = useAuth();
   const navigate = useNavigate();
@@ -986,13 +986,13 @@ export function AdminConsolePage({ initialTab = 'overview' }) {
           { name: 'name', label: 'Centre name', required: true, placeholder: 'Sunrise Diagnostics' },
           { name: 'area', label: 'Area', required: true, placeholder: 'Rajpur Road' },
           { name: 'address', label: 'Full address', required: true, placeholder: `12 ${SAMPLE_AREA}, ${CITY}` },
-          { name: 'lat', label: 'Latitude', type: 'number', required: true, placeholder: '30.3165' },
+          { name: 'lat', label: 'Latitude', type: 'number', required: true, placeholder: String(DEFAULT_LAT) },
           {
             name: 'lng',
             label: 'Longitude',
             type: 'number',
             required: true,
-            placeholder: '78.0322',
+            placeholder: String(DEFAULT_LNG),
             help: 'Used to sort centres by distance from the patient.',
           },
           {

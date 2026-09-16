@@ -10,6 +10,7 @@ import { Pressable3D, SkeletonList, SkeletonCard, elevation } from '../component
 import Icon from '../components/Icon.jsx';
 import { formatSlot, STATUS_LABELS, testNamesOf, greetingFor } from '../lib/format.js';
 
+import { CITY } from '../config/locale.js';
 /**
  * Home, transcribed from the prototype's #screen-home: greeting + avatar,
  * search bar, active booking card, category scroll, doctor cards, 2x2 health hub.
@@ -193,7 +194,7 @@ export default function HomeScreen({ navigation }) {
             testID="empty-doctors"
             icon="stethoscope"
             title="No partner doctors yet"
-            message="Verified partner doctors in Dehradun will be listed here as they join."
+            message={`Verified partner doctors in ${CITY} will be listed here as they join.`}
           />
         ) : (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>

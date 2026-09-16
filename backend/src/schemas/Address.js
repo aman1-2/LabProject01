@@ -25,13 +25,20 @@ const addressSchema = new mongoose.Schema(
       trim: true,
       match: [/^\d{6}$/, 'Please enter a valid 6-digit Indian pincode'],
     },
+    // No default. A document reaching the database without coordinates is a
+    // bug upstream; defaulting it to a city centre hides that bug and sends a
+    // rider to the wrong place. Fail here instead.
     lat: {
       type: Number,
-      default: 30.3165,
+      required: [true, 'Latitude is required'],
+      min: -90,
+      max: 90,
     },
     lng: {
       type: Number,
-      default: 78.0322,
+      required: [true, 'Longitude is required'],
+      min: -180,
+      max: 180,
     },
     isDefault: {
       type: Boolean,

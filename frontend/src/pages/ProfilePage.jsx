@@ -10,7 +10,7 @@ import Icon from '../components/atoms/Icon.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar.jsx';
 import SubscriptionsPanel from '../components/organisms/SubscriptionsPanel.jsx';
 
-import { SAMPLE_ADDRESS } from '../lib/locale.js';
+import { SAMPLE_ADDRESS, DEFAULT_LAT, DEFAULT_LNG } from '../lib/locale.js';
 export default function ProfilePage() {
   const { user, api, logout, updateUser } = useAuth();
   const navigate = useNavigate();
@@ -141,8 +141,8 @@ export default function ProfilePage() {
       if (profileLocation.trim()) {
         payload.location = {
           address: profileLocation.trim(),
-          lat: user?.location?.lat || 30.3165,
-          lng: user?.location?.lng || 78.0322,
+          lat: user?.location?.lat || DEFAULT_LAT,
+          lng: user?.location?.lng || DEFAULT_LNG,
           source: 'manual',
         };
       }

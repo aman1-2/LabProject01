@@ -21,8 +21,7 @@ import {
   ScreenHeader,
 } from '../components/ui.jsx';
 import { formatCurrency, formatSlot, testNamesOf, STATUS_LABELS, STATUS_TONES } from '../lib/format.js';
-import { DEHRADUN } from '../config/city.js';
-
+import { CITY, CITY_CENTRE as DEHRADUN } from '../config/locale.js';
 /**
  * The Profile sub-screens: addresses, family members, bookings, reports.
  *
@@ -100,7 +99,7 @@ export function AddressesScreen({ navigation }) {
           style={[input.base, styles.field]}
           value={line}
           onChangeText={setLine}
-          placeholder="House / street / area, Dehradun"
+          placeholder={`House / street / area, ${CITY}`}
           placeholderTextColor={colors.muted2}
           multiline
         />
