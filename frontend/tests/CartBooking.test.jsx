@@ -54,6 +54,23 @@ const LABS = {
   ],
 };
 
+/**
+ * The saved address a home collection is sent to.
+ *
+ * Carries real coordinates because the lab search is run from them — an
+ * address whose text and position disagree is what sent a patient's booking
+ * to a city 200km away while the screen showed their own street.
+ */
+const ADDRESS = {
+  _id: '67a123456789abcdef000009',
+  label: 'Home',
+  line: 'Civil Lines',
+  pincode: '244001',
+  lat: 28.8386,
+  lng: 78.7733,
+  isDefault: true,
+};
+
 const CATALOGUE = { [CBC.slug]: CBC, [VITD.slug]: VITD };
 
 const fetchTestBySlug = vi.fn(async (slug) => CATALOGUE[slug]);
@@ -167,7 +184,15 @@ describe('booking a cart', () => {
     vi.clearAllMocks();
     window.localStorage.clear();
     post.mockResolvedValue({ data: { data: { _id: 'bk_1', mode: 'home' } } });
-    get.mockResolvedValue({ data: { data: [] } });
+    // Routed by URL rather than one blanket response. A home collection has to
+    // resolve to a real address — a single `{ data: [] }` for every GET meant
+    // the page had no address book, which is indistinguishable from a patient
+    // who has never saved one.
+    get.mockImplementation(async (url) =>
+      url === '/api/addresses'
+        ? { data: { data: [ADDRESS] } }
+        : { data: { data: [] } }
+    );
   });
 
   it('loads every test in the cart when no slug is in the URL', async () => {
@@ -250,6 +275,30 @@ describe('booking a cart', () => {
     // This is the assertion the whole cart rests on. If it ever reduces to one
     // id, a patient pays for a panel and gets a single test collected.
     expect(payload.testIds).toEqual([CBC._id, VITD._id]);
+    // The server rejects a home collection without this, and the page sent no
+    // `addressId` at all — so every home booking on the web failed validation
+    // before a booking existed, Razorpay never opened, and the pay button
+    // looked inert. Nothing asserted the payload carried it.
+    expect(payload.addressId).toBe(ADDRESS._id);
+  });
+
+  it('blocks a home collection when there is no address to collect from', async () => {
+    // Better to say so here than to let the server answer 400 with a message
+    // that never reaches the screen.
+    get.mockResolvedValue({ data: { data: [] } });
+    seedCart([CBC]);
+    renderBooking();
+
+    await waitFor(() => expect(screen.getByTestId('confirm-booking-btn')).toBeEnabled());
+    fireEvent.click(screen.getByTestId('pay-cash-card'));
+    fireEvent.click(screen.getByTestId('confirm-booking-btn'));
+
+    // `getAllBy`: the submit error is shown both in the banner and beside the
+    // button, deliberately, so it cannot be scrolled out of sight.
+    await waitFor(() =>
+      expect(screen.getAllByText(/add a collection address/i).length).toBeGreaterThan(0)
+    );
+    expect(post).not.toHaveBeenCalled();
   });
 
   it('empties the basket once the booking exists, so it cannot be booked twice', async () => {

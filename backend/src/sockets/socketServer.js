@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createPubSubClient } from '../config/redisConfig.js';
 import { authenticateSocket, canJoinBookingRoom } from './socketAuth.js';
+import serverConfig from '../config/serverConfig.js';
 import logger from '../utils/logger.js';
 
 let io = null;
@@ -15,7 +16,18 @@ let adapterSubClient = null;
 export function initializeSocket(httpServer, options = {}) {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+      /**
+       * The parsed list, not the raw environment string.
+       *
+       * `process.env.CORS_ORIGIN` is a comma-separated value. Handed over
+       * whole it works by accident with one origin and breaks silently with
+       * two: the handshake answers
+       * `Access-Control-Allow-Origin: https://a,https://b`, which no browser
+       * accepts. The REST API kept working — it parses the same variable in
+       * serverConfig — so the symptom was live tracking going dead on a
+       * deployment where every other call was fine.
+       */
+      origin: serverConfig.corsOrigin,
       methods: ['GET', 'POST', 'PATCH'],
       credentials: true,
     },

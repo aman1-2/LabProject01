@@ -46,11 +46,11 @@ export default function BookingPage() {
   // Everything in this booking. `test` stays the first one, because the page's
   // headline, sample type and preparation notes are all singular.
   const [tests, setTests] = useState([]);
-  const [labs, setLabs] = useState([]);
   const [partnerDoctors, setPartnerDoctors] = useState([]);
 
   // Booking Draft State
   const [mode, setMode] = useState(initialMode);
+  const [selectedAddressId, setSelectedAddressId] = useState('');
   const [selectedPatient, setSelectedPatient] = useState('self'); // 'self' | memberId
   const [familyMembers, setFamilyMembers] = useState([]);
   const [, setLoadingMembers] = useState(false);
@@ -129,23 +129,6 @@ export default function BookingPage() {
         const resolvedMode = everyTestGoesHome ? initialMode : 'visit';
         setMode(resolvedMode);
 
-        // Lab prices come back for the first test; the multiplier they carry is
-        // what the server applies to the whole basket, so the total below is
-        // computed from it the same way calculateBookingPrice does.
-        const labsData = await fetchNearbyLabs({
-          lat: DEFAULT_LAT,
-          lng: DEFAULT_LNG,
-          testId: testData.slug,
-        });
-
-        if (isMounted) {
-          const loadedLabs = labsData?.labs || [];
-          setLabs(loadedLabs);
-          if (loadedLabs.length > 0) {
-            setSelectedLabId(loadedLabs[0].id);
-          }
-        }
-
         // Fetch partner doctors
         try {
           const docs = await fetchDoctors({}, api);
@@ -219,6 +202,72 @@ export default function BookingPage() {
       setAddMemberSubmitting(false);
     }
   };
+
+  /**
+   * The patient's address book.
+   *
+   * Two things depend on it, and they used to disagree. The booking is
+   * collected from an address the server resolves out of this list, while the
+   * lab search ran from the city centre — so the distances on screen were
+   * measured from somewhere the patient had never been, and editing their
+   * address changed nothing they could see.
+   */
+  const addressesQuery = useQuery({
+    queryKey: ['addresses'],
+    queryFn: async () => (await api.get('/api/addresses')).data?.data ?? [],
+  });
+  const addresses = React.useMemo(() => addressesQuery.data ?? [], [addressesQuery.data]);
+
+  /**
+   * Which address this booking collects from.
+   *
+   * Same precedence the mobile app uses (`BookingScreen.jsx`): an explicit
+   * choice, else the one marked default, else the first. Kept identical on
+   * purpose — two rules for "where does the rider go" is one more than anyone
+   * can hold in their head.
+   */
+  const effectiveAddress =
+    addresses.find((a) => a._id === selectedAddressId) ??
+    addresses.find((a) => a.isDefault) ??
+    addresses[0] ??
+    null;
+
+  /**
+   * Where to search for labs.
+   *
+   * The patient's own coordinates when we have them, the configured city
+   * centre only when the address book is empty. `Number.isFinite` rather than
+   * a truthiness check because a legitimate 0 is a valid coordinate, and
+   * because an address saved before lat/lng were required can carry undefined.
+   */
+  const searchLat = Number.isFinite(effectiveAddress?.lat) ? effectiveAddress.lat : DEFAULT_LAT;
+  const searchLng = Number.isFinite(effectiveAddress?.lng) ? effectiveAddress.lng : DEFAULT_LNG;
+
+  const labsQuery = useQuery({
+    queryKey: ['labs', 'nearby', test?.slug ?? null, searchLat, searchLng],
+    queryFn: () => fetchNearbyLabs({ lat: searchLat, lng: searchLng, testId: test.slug }),
+    enabled: Boolean(test?.slug) && Number.isFinite(searchLat) && Number.isFinite(searchLng),
+  });
+  // Memoised on the response object so the identity is stable between renders;
+  // a fresh `[]` each time would re-run the selection effect below forever.
+  const labs = React.useMemo(() => labsQuery.data?.labs ?? [], [labsQuery.data]);
+
+  /**
+   * Keep the chosen lab valid.
+   *
+   * Moving the address re-runs the search, and the previously selected centre
+   * may not serve the new one. Holding a stale id would price and book a lab
+   * that is no longer on screen.
+   */
+  useEffect(() => {
+    if (labs.length === 0) {
+      setSelectedLabId('');
+      return;
+    }
+    if (!labs.some((l) => l.id === selectedLabId)) {
+      setSelectedLabId(labs[0].id);
+    }
+  }, [labs, selectedLabId]);
 
   // Selected Lab object & server-side calculated pricing
   const selectedLab = labs.find((l) => l.id === selectedLabId) || labs[0];
@@ -298,6 +347,22 @@ export default function BookingPage() {
       );
       return;
     }
+    /**
+     * Home collection needs somewhere to collect from.
+     *
+     * The server rejects this with a 400 the patient never sees, so it is
+     * caught here where there is somewhere to say it. This page did not send
+     * `addressId` at all, which made every home-collection booking on the web
+     * fail validation before a booking existed — so Razorpay never opened and
+     * the button looked dead.
+     */
+    if (mode === 'home' && !effectiveAddress?._id) {
+      setSubmitError(
+        'Add a collection address on your profile before booking a home visit — ' +
+          'we need to know where to send the phlebotomist.'
+      );
+      return;
+    }
 
     setSubmitError('');
     setIsSubmitting(true);
@@ -346,6 +411,9 @@ export default function BookingPage() {
         paymentMode,
         referralSource,
         familyMemberId: selectedPatient !== 'self' ? selectedPatient : null,
+        // Only for home collection — the server requires it there and ignores
+        // it for a lab visit, where the patient travels to the centre.
+        ...(mode === 'home' ? { addressId: effectiveAddress?._id } : {}),
       };
 
       // 1. Call POST /api/bookings with Idempotency-Key header
@@ -643,12 +711,67 @@ export default function BookingPage() {
             <Card className="p-5 sm:p-6 mb-4 border border-border">
               <p className="font-extrabold text-[15px] text-ink mb-3.5">2 · Choose a lab</p>
 
+              {/* The address sits here, above the list, because it is what the
+                  distances below are measured from. Putting it on its own step
+                  hid that relationship: changing it silently reorders the labs,
+                  and for home collection it is also where the rider is sent. */}
+              {addresses.length > 0 ? (
+                <div className="mb-3.5 rounded-lg border border-border bg-chipGreyBg px-3.5 py-3">
+                  <p className="text-[11.5px] font-bold uppercase tracking-wide text-muted">
+                    {mode === 'home' ? 'Collecting from' : 'Distances from'}
+                  </p>
+                  {addresses.length === 1 ? (
+                    <p className="text-sm text-ink mt-1" data-testid="booking-address-line">
+                      {effectiveAddress?.label ? `${effectiveAddress.label} · ` : ''}
+                      {effectiveAddress?.line}
+                    </p>
+                  ) : (
+                    <select
+                      className="mt-1.5 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-ink"
+                      value={effectiveAddress?._id ?? ''}
+                      onChange={(e) => setSelectedAddressId(e.target.value)}
+                      data-testid="booking-address-select"
+                    >
+                      {addresses.map((a) => (
+                        <option key={a._id} value={a._id}>
+                          {a.label ? `${a.label} · ` : ''}
+                          {a.line}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className="mb-3.5 rounded-lg border border-amber bg-amberBg px-4 py-3.5"
+                  data-testid="booking-no-address"
+                >
+                  <p className="text-sm font-bold text-ink">No saved address</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {mode === 'home'
+                      ? 'Add one on your profile so we know where to send the phlebotomist. '
+                      : 'Add one on your profile to see labs nearest you. '}
+                    Until then we are showing labs around {CITY}.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/profile')}
+                    className="mt-2 text-xs font-bold text-blue600 hover:underline cursor-pointer"
+                    data-testid="booking-add-address-link"
+                  >
+                    Add an address
+                  </button>
+                </div>
+              )}
+
               {/* An empty list used to render as an empty box, which reads as
                   "still loading" rather than "there is nothing here". Without
                   a lab there is no booking to place, so say so where the user
                   is looking instead of letting them reach the pay button and
                   find it inert. */}
-              {labs.length === 0 ? (
+              {labsQuery.isPending ? (
+                <Skeleton className="h-16 w-full rounded-lg" />
+              ) : labs.length === 0 ? (
                 <div
                   data-testid="no-labs-in-range"
                   className="rounded-lg border border-amber bg-amberBg px-4 py-3.5"
